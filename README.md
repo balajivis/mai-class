@@ -8,8 +8,7 @@ The full pedagogical vision lives in [`PROJECT.md`](./PROJECT.md). Read that fir
 
 | Folder | Role in the class |
 |---|---|
-| [`multiagent-primer/`](./multiagent-primer/) | Four short labs that make students *feel* coordination primitives: Lab 0 (single-agent rhythm — bundles gstack and the SDRAuto sandbox), Lab 1 (blackboard), Lab 2 (task allocation), Lab 3 (team design). **Blocks A + B + F** — the core curriculum and the production reference walk. See its [`PROJECT.md`](./PROJECT.md). |
-| [`openclaw/`](./openclaw/) | Self-hosted agent gateway — connect a Claude/Groq agent to Telegram, WhatsApp, Discord. **Block D** — agents on real channels. |
+| [`multiagent-primer/`](./multiagent-primer/) | The core curriculum. Five labs: Lab 0 (single-agent rhythm — bundles gstack + SDRAuto), Lab 1 (blackboard), Lab 2 (task allocation), Lab 3 (team design), Lab 4 *optional* (openclaw — agents on real channels). **Blocks A + B + D + F**. See its [`PROJECT.md`](./PROJECT.md). |
 | [`brownfield/`](./brownfield/) | Legacy DocVault Java app + a sprints dashboard + a working `board.md`. **Block E capstone** — multi-agent triage on code students didn't write. |
 | [`blackboard-classroom/`](./blackboard-classroom/) | The big-exercise classroom server (separate deploy lifecycle). |
 | [`workshop-kit/`](./workshop-kit/) | Instructor-side agents, hooks, MCP servers, monitors. |
@@ -18,7 +17,7 @@ The full pedagogical vision lives in [`PROJECT.md`](./PROJECT.md). Read that fir
 
 1. **Block A — Single-agent workflow rhythm** (`multiagent-primer/lab0-workflow/`, bundles gstack) — 45 min
 2. **Block B — Feel the primitives** (`multiagent-primer/` Labs 1-3) — 90 min
-3. **Block D — Real channel, real human** (`openclaw/`) — 45 min
+3. **Block D — Real channel, real human** (`multiagent-primer/lab4-openclaw (optional)/`) — 45 min, *optional*
 4. **Block E — Brownfield triage capstone** (`brownfield/`) — 2 hr
 5. **Block F — Production walk** (`multiagent-primer/lab0-workflow/SDRAuto/`) — 30 min
 
@@ -29,7 +28,7 @@ The four primer labs (0 → 1 → 2 → 3) are designed to be done in sequence �
 - Claude Code installed
 - An Anthropic Pro/Max subscription or API key
 - Node.js 18+, bash, git
-- A Groq account (free) for the openclaw block
+- A Groq account (free) — only if you do the optional Lab 4 (openclaw)
 
 ## License
 

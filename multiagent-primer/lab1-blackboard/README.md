@@ -2,7 +2,7 @@
 
 **Time:** 25 min (5 setup · 15 work · 5 reflect)
 **Lessons it reinforces:** §8 Shared State
-**Where this fits:** comes after [Lab 0 — Workflow Rhythm](../lab0-workflow/) in the [multi-agent primer](../). Block B of the [mai-class day](../../README.md). Read `../../PROJECT.md` for the full pedagogical thesis.
+**Where this fits:** comes after [Lab 0 — Workflow Rhythm](../lab0-workflow/) and before Labs 2, 3, and the optional Lab 4 (openclaw) in the [multi-agent primer](../). Block B of the [mai-class day](../../README.md). Read `../../PROJECT.md` for the full pedagogical thesis.
 
 ---
 

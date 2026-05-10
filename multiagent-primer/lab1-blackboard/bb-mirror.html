@@ -653,8 +653,9 @@ function render(state){
     const lastObserved = agentLastSeen(slot);
     const agoObserved = lastObserved ? (now - lastObserved) : Infinity;
 
-    // kick out: never wrote AND not even registered, OR inactive >5 min
-    const shouldHide = (!entry && !last) || (lastObserved && agoObserved > KICK_AGENT_SECS);
+    // kick out only after observed activity has gone stale (>5 min).
+    // Pre-arrival slots stay visible as faint placeholders so you see who's coming.
+    const shouldHide = lastObserved && agoObserved > KICK_AGENT_SECS;
     card.style.display = shouldHide ? 'none' : '';
 
     if(entry){
