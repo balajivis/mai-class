@@ -16,13 +16,15 @@ Concretely: you'll run one Claude Code session through a packaged sprint workflo
 
 ## Apparatus
 
-This lab uses [`../../gstack-practice/gstack/`](../../gstack-practice/gstack/) as the toolkit. It's a single-agent workflow library — 20 specialist slash commands, no coordination machinery. (If you wondered "why are we using a framework in the no-framework primer?" — read the *Note on frameworks* in [`../PROJECT.md`](../PROJECT.md). Short answer: gstack is single-agent workflow scaffolding, not multi-agent coordination. The primer's no-framework rule is about the latter.)
+This lab uses [`./gstack/`](./gstack/) as the toolkit. It's a single-agent workflow library — 20 specialist slash commands, no coordination machinery. See [`gstack-reference.md`](./gstack-reference.md) for the full slash-command catalog.
+
+(If you wondered "why are we using a framework in the no-framework primer?" — read the *Note on frameworks* in [`../../PROJECT.md`](../../PROJECT.md). Short answer: gstack is single-agent workflow scaffolding, not multi-agent coordination. The primer's no-framework rule is about the latter.)
 
 ---
 
 ## Setup (10 min)
 
-1. **Install gstack** — follow the README in `../../gstack-practice/gstack/`. On first install you'll get a ~58MB compiled Bun binary plus a headless Chromium daemon. Budget ~5 min on a fresh laptop.
+1. **Install gstack** — follow the README in `./gstack/`. On first install you'll get a ~58MB compiled Bun binary plus a headless Chromium daemon. Budget ~5 min on a fresh laptop.
 
 2. **Pick your sandbox.** You need a small repo to act on. Pick one:
    - `../../SDRAuto/` — a real Node/TS BDR product (read-only — *do not commit*)

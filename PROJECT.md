@@ -60,7 +60,7 @@ A LangGraph comparison remains a take-home bonus *after* the labs — that one i
 ### Lab 0 — `lab0-workflow/` ✅ BUILT (bridge to gstack)
 - **Time:** 45 min (10 setup · 30 work · 5 reflect)
 - **Topology:** 1 agent, structured workflow
-- **Apparatus:** [`gstack`](../gstack-practice/gstack/) — single-agent slash-command toolkit (Plan → Review → Build → Ship → Retro)
+- **Apparatus:** [`gstack`](./multiagent-primer/lab0-workflow/gstack/) — single-agent slash-command toolkit (Plan → Review → Build → Ship → Retro), bundled inside the lab folder
 - **Task:** run one tiny feature/fix end-to-end through the gstack sprint loop on a small sandbox repo
 - **Lesson it sets up:** §2 Agent Anatomy and the inversion that lands in Lab 1 — students feel the *single-agent ceiling* before they meet the *coordination problem*
 - **Pain it teaches:** none directly — the absence of pain is the point. This lab makes Lab 1's pain legible.

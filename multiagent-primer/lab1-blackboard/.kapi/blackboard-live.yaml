@@ -40,3 +40,18 @@ transports:
   shim-58761: null
   shim-58762: null
   shim-58816: null
+  shim-59209:
+    status: active
+    last_seen: 2026-05-10T01:18:40Z
+    port: 59209
+    gemini: disabled
+  shim-59207:
+    status: active
+    last_seen: 2026-05-10T01:18:40Z
+    port: 59207
+    gemini: disabled
+  shim-59208:
+    status: active
+    last_seen: 2026-05-10T01:18:40Z
+    port: 59208
+    gemini: disabled

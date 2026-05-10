@@ -93,6 +93,8 @@ Once you're in the Ubuntu shell, you can let Claude do the rest:
 
    You can also just `cat blackboard.md` at any time — the file is the source of truth.
 
+   **Projection mode** — for classroom display, run `./bb-serve.sh` in any spare terminal. It serves an editorial web mirror at <http://localhost:8765/bb-mirror.html> with the same warnings (duplicates, idle, synthesis) rendered as four partition cards on a chalkboard. Use this on the projector while keeping `bb-watch.sh` in your tmux pane for personal monitoring.
+
 4. **In each agent pane, paste this single message to kick off:**
 
    > Read `task.md`. Register yourself on the roster. Then begin.

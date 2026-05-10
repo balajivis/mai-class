@@ -8,8 +8,7 @@ The full pedagogical vision lives in [`PROJECT.md`](./PROJECT.md). Read that fir
 
 | Folder | Role in the class |
 |---|---|
-| [`gstack-practice/`](./gstack-practice/) | Garry Tan's gstack — structured single-agent workflow (Plan → Build → Review → Ship). The *toolkit* used by Lab 0. |
-| [`multiagent-primer/`](./multiagent-primer/) | Four short labs that make students *feel* coordination primitives: Lab 0 (single-agent rhythm via gstack), Lab 1 (blackboard), Lab 2 (task allocation), Lab 3 (team design). **Blocks A + B** — the core curriculum. See its [`PROJECT.md`](./PROJECT.md). |
+| [`multiagent-primer/`](./multiagent-primer/) | Four short labs that make students *feel* coordination primitives: Lab 0 (single-agent rhythm — bundles gstack), Lab 1 (blackboard), Lab 2 (task allocation), Lab 3 (team design). **Blocks A + B** — the core curriculum. See its [`PROJECT.md`](./PROJECT.md). |
 | [`openclaw/`](./openclaw/) | Self-hosted agent gateway — connect a Claude/Groq agent to Telegram, WhatsApp, Discord. **Block D** — agents on real channels. |
 | [`brownfield/`](./brownfield/) | Legacy DocVault Java app + a sprints dashboard + a working `board.md`. **Block E capstone** — multi-agent triage on code students didn't write. |
 | [`SDRAuto/`](./SDRAuto/) | A real autonomous-BDR product (read-only reference). **Block F** — what production single-agent systems actually look like. |
@@ -18,7 +17,7 @@ The full pedagogical vision lives in [`PROJECT.md`](./PROJECT.md). Read that fir
 
 ## Class arc (1 day)
 
-1. **Block A — Single-agent workflow rhythm** (`multiagent-primer/lab0-workflow/`, runs gstack) — 45 min
+1. **Block A — Single-agent workflow rhythm** (`multiagent-primer/lab0-workflow/`, bundles gstack) — 45 min
 2. **Block B — Feel the primitives** (`multiagent-primer/` Labs 1-3) — 90 min
 3. **Block D — Real channel, real human** (`openclaw/`) — 45 min
 4. **Block E — Brownfield triage capstone** (`brownfield/`) — 2 hr
