@@ -46,14 +46,14 @@ You need a small repo to act on. Pick **one**:
 
 | Sandbox | Path | Notes |
 |---|---|---|
-| **SDRAuto** *(default)* | `./SDRAuto/` | A real Node/TS BDR product. **Read-only — do not push.** Drop a small fix, run `/ship` *without* the actual push, then revert. |
-| DocVault Legacy *(alt — Java)* | `./docvault-legacy/` | Fake-but-realistic legacy Spring/Java app with a published bug list in `REVIEW.yaml` and `TODO.md`. Pick one bug and walk it through. Good choice if you'd rather work in Java than TypeScript. |
+| **DocVault Legacy** *(default — recommended)* | `./docvault-legacy/` | Fake-but-realistic legacy Spring/Java app. Ships with a **graded bug list**: 38 categorized findings in `REVIEW.yaml` (8 critical, 7 high, 12 medium…) plus a period-realistic `TODO.md` from "Sprint 38, 2021." You don't waste time *finding* what to fix — you pick from the menu and feel the gstack rhythm. |
+| SDRAuto *(alt — Node/TS)* | `./SDRAuto/` | A real Node/TS BDR product. **Read-only — do not push.** Drop a small fix, run `/ship` *without* the actual push, then revert. Choose this if you'd rather work in TypeScript than Java. |
 | Your own repo | anywhere on your laptop | < 5k LOC ideally |
 
 ### Step 3 — Open one Claude Code session in that sandbox
 
 ```bash
-cd ./SDRAuto    # or whichever sandbox you picked
+cd ./docvault-legacy    # or whichever sandbox you picked
 claude
 ```
 
@@ -65,23 +65,44 @@ claude
 
 Run a single small change end-to-end through the gstack sprint loop. Pick a *tiny* scope: fix one bug, add one input validator, rename one confusing function. The point is to feel the rhythm, not to ship a feature.
 
-### The loop
+### Recommended path: DocVault + the gstack loop
 
-| Step | Slash command | What it does | Time |
+If you picked DocVault, here are the **exact prompts** to paste at each step. Substitute one of the *good first picks* (below) for `<ISSUE>`.
+
+| Step | Command | Prompt to paste | Time |
 |---|---|---|---|
-| 0 | `/office-hours` | Reframes your idea before you write code. Challenges premises. | 5 min |
-| 1 | `/plan-eng-review` | Locks architecture, data flow, edge cases, and a test plan for the change. | 5 min |
-| 2 | *(you implement)* | Make the change. The plan from step 1 is your guardrail. | 10 min |
-| 3 | `/review` | Pre-landing review. Finds bugs that pass CI but break in prod. | 5 min |
-| 4 | `/qa-only` | Headless browser sanity check. *Skip if your change has no UI.* | 3 min |
-| 5 | `/ship` | Runs tests, opens a PR. **Don't actually push if you're in SDRAuto.** | 5 min |
-| 6 | `/retro` | Two-minute retrospective on the loop you just ran. | 2 min |
+| 0 | `/office-hours` | "I'm picking up a legacy Spring Boot app. Read `BROWNFIELD-BRIEFING.md`, `REVIEW.yaml`, and `TODO.md`. What should I tackle first as a 30-min change?" | 5 min |
+| 1 | `/plan-eng-review` | "Plan the fix for `<ISSUE>` — locate the file, identify the change, list edge cases and tests." | 5 min |
+| 2 | *(implement)* | Make the change. The plan from step 1 is your guardrail. | 10 min |
+| 3 | `/review` | "Review my diff against the plan. Catch anything that would break in prod." | 5 min |
+| 4 | `/qa-only` | *(skip — DocVault has no UI to browse-test)* | — |
+| 5 | `/ship` | "Open a PR titled `fix(<ISSUE>): <one line>` — but don't push, this is a sandbox." | 5 min |
+| 6 | `/retro` | *(no prompt needed — gstack runs a 2-min retro)* | 2 min |
+
+### Good first picks (30-min scope)
+
+These are picked from `REVIEW.yaml` / `TODO.md` and are sized for one Lab 0 sprint:
+
+- **`SEC-001`** — *No auth on AdminController.* One file, add `@PreAuthorize`, write a test.
+- **Race condition in checkout** *(TODO.md P0)* — Two users buying the last item simultaneously. Small, scoped, has a test you can write.
+- **DTO leakage** *(TODO.md P1)* — "Stop returning JPA entities directly from REST endpoints." Pick one endpoint, add a DTO, refactor the controller.
+
+### What to **avoid** for Lab 0 (too big — `/plan-eng-review` will push back)
+
+- "Migrate from Elasticsearch 7.x to OpenSearch" — multi-week migration
+- "Split OrderService into smaller services" — refactor sprawl
+- "Internationalize the codebase" — boil-the-ocean
+- Any of Carlos's "side projects" in `RewardsEngine.java`
 
 ### Notes for the Claude session
 
 - Use the slash commands by name. Each one loads a SKILL.md that gives you a specialist persona for that step.
-- Stay in scope. If `/plan-eng-review` produces a plan with 12 items, pick *one* and ship that one. Resist the temptation to do everything.
+- **Stay in scope.** If `/plan-eng-review` produces a plan with 12 items, pick *one* and ship that one. Resist the temptation to do everything — that's the lesson.
 - If a command isn't recognized, gstack didn't install correctly — go back to Setup Step 1.
+
+### If you picked SDRAuto or your own repo instead
+
+Same loop, same time budget — but you'll spend the first 5 min in `/office-hours` figuring out *what* to change, instead of picking from a graded list. That's a slightly different (and slightly slower) experience. Either is fine.
 
 ---
 
@@ -114,7 +135,9 @@ If you finished thinking "I don't need multi-agent for anything I do" — good. 
 | `/office-hours` not recognized | gstack didn't install or didn't register | Re-run Setup Step 1; check `ls ~/.claude/skills/gstack` |
 | `bun: command not found` during install | Bun missing | `curl -fsSL https://bun.sh/install \| bash` then re-run install |
 | `/qa-only` errors with "no browser" | First-run Chromium download didn't finish | Run `cd ~/.claude/skills/gstack && ./setup` again |
-| `/ship` wants to push but you're in SDRAuto | gstack defaults to push | Tell it "draft only, do not push" in the same message |
+| `/ship` wants to push but you're in a sandbox | gstack defaults to push | Tell it "draft only, do not push" in the same message |
+| `/plan-eng-review` rejects your scope as too large | This is the lesson, not a bug | Pick a smaller issue from the *Good first picks* list above |
+| DocVault won't build (`mvn` errors) | Maven version or missing JDK | The lab doesn't actually require a passing build — gstack reads the source and reasons about the change. Skip the build. |
 
 ---
 

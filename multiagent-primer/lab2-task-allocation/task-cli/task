@@ -1,0 +1,158 @@
+#!/usr/bin/env node
+// task — atomic task allocator for Lab 2.
+// commands:
+//   task list [--mine agent-N] [--open]
+//   task claim <id> --as agent-N
+//   task done  <id> --as agent-N --result "<summary>"
+//   task add   "<title>" --needs /skill [--estimate N]
+//   task status
+
+const fs   = require('fs');
+const path = require('path');
+
+const FILE = path.resolve(__dirname, '..', 'tasks.json');
+const LOCK = FILE + '.lock';
+
+// ── atomic lock via O_EXCL — POSIX-portable, no flock needed ──────────────
+function withLock(fn) {
+  const start = Date.now();
+  while (true) {
+    try {
+      const fd = fs.openSync(LOCK, 'wx');
+      try { return fn(); }
+      finally { try { fs.closeSync(fd); } catch {} fs.unlinkSync(LOCK); }
+    } catch (e) {
+      if (e.code !== 'EEXIST') throw e;
+      if (Date.now() - start > 3000) throw new Error('lock timeout — a previous run may have crashed; rm ' + LOCK);
+      // sleep ~30ms with jitter
+      const ms = 20 + Math.floor(Math.random() * 30);
+      const until = Date.now() + ms;
+      while (Date.now() < until) {}
+    }
+  }
+}
+
+function loadTasks() {
+  if (!fs.existsSync(FILE)) {
+    console.error(`tasks.json not found at ${FILE}`);
+    console.error(`run ./lab2-up.sh to seed it from tasks.template.json`);
+    process.exit(2);
+  }
+  return JSON.parse(fs.readFileSync(FILE, 'utf8'));
+}
+function saveTasks(data) {
+  data.version++;
+  fs.writeFileSync(FILE, JSON.stringify(data, null, 2) + '\n');
+}
+
+function findTask(data, id) {
+  const t = data.tasks.find(x => x.id === id);
+  if (!t) throw new Error(`task ${id} not found`);
+  return t;
+}
+
+// ── arg parsing ───────────────────────────────────────────────────────────
+function flag(name, args) {
+  const i = args.indexOf('--' + name);
+  return i >= 0 ? args[i + 1] : null;
+}
+function has(name, args) { return args.includes('--' + name); }
+
+const [cmd, ...rest] = process.argv.slice(2);
+
+const COLORS = { open: '\x1b[36m', claimed: '\x1b[33m', done: '\x1b[32m', dim: '\x1b[2m', reset: '\x1b[0m' };
+function col(s, c) { return process.stdout.isTTY ? COLORS[c] + s + COLORS.reset : s; }
+
+// ── commands ──────────────────────────────────────────────────────────────
+function cmdList() {
+  const data = loadTasks();
+  const mine = flag('mine', rest);
+  const onlyOpen = has('open', rest);
+  for (const t of data.tasks) {
+    if (mine && t.claimed_by !== mine) continue;
+    if (onlyOpen && t.status !== 'open') continue;
+    const status = t.status.padEnd(8);
+    const needs  = (t.needs || []).join(',');
+    const owner  = t.claimed_by ? ` · ${t.claimed_by}` : '';
+    console.log(`${col(t.id, 'dim')}  ${col(status, t.status)}  ${col(needs.padEnd(22), 'dim')}  ${t.title}${col(owner, 'dim')}`);
+  }
+}
+
+function cmdClaim() {
+  const id = rest[0];
+  const agent = flag('as', rest);
+  if (!id || !agent) { console.error('usage: task claim <id> --as agent-N'); process.exit(2); }
+  const r = withLock(() => {
+    const data = loadTasks();
+    const t = findTask(data, id);
+    if (t.status !== 'open') {
+      return { ok:false, msg: col(`✗ ${id} is ${t.status}` + (t.claimed_by ? ` by ${t.claimed_by}` : ''), 'claimed') };
+    }
+    t.status = 'claimed'; t.claimed_by = agent; t.claimed_at = new Date().toISOString();
+    saveTasks(data);
+    return { ok:true, task: t };
+  });
+  if (!r.ok) { console.error(r.msg); process.exit(1); }
+  console.log(col(`✓ ${id} claimed by ${agent}`, 'done'));
+  if (r.task.needs?.length) console.log(col(`  needs: ${r.task.needs.join(', ')} — verify you have these capabilities`, 'dim'));
+  console.log(col(`  output → ${r.task.output}`, 'dim'));
+}
+
+function cmdDone() {
+  const id = rest[0];
+  const agent = flag('as', rest);
+  const result = flag('result', rest) || 'done';
+  if (!id || !agent) { console.error('usage: task done <id> --as agent-N --result "summary"'); process.exit(2); }
+  const r = withLock(() => {
+    const data = loadTasks();
+    const t = findTask(data, id);
+    if (t.status !== 'claimed') return { ok:false, msg: `✗ ${id} is ${t.status}` };
+    if (t.claimed_by !== agent)  return { ok:false, msg: `✗ ${id} claimed by ${t.claimed_by}, not ${agent}` };
+    t.status = 'done'; t.completed_at = new Date().toISOString(); t.result = result;
+    saveTasks(data);
+    return { ok:true };
+  });
+  if (!r.ok) { console.error(r.msg); process.exit(1); }
+  console.log(col(`✓ ${id} done by ${agent}`, 'done'));
+}
+
+function cmdAdd() {
+  const title = rest[0];
+  const needs = (flag('needs', rest) || '').split(',').filter(Boolean);
+  const estimate = parseInt(flag('estimate', rest) || '3', 10);
+  if (!title) { console.error('usage: task add "title" --needs /skill[,/skill]'); process.exit(2); }
+  withLock(() => {
+    const data = loadTasks();
+    const n = data.tasks.length + 1;
+    const id = 'T-' + String(n).padStart(2, '0');
+    data.tasks.push({
+      id, title, needs, estimate_min: estimate,
+      output: `outputs/${id}.md`,
+      status: 'open', claimed_by: null, claimed_at: null,
+      completed_at: null, result: null,
+    });
+    saveTasks(data);
+    console.log(col(`✓ added ${id}`, 'done'));
+  });
+}
+
+function cmdStatus() {
+  const data = loadTasks();
+  const counts = { open: 0, claimed: 0, done: 0 };
+  for (const t of data.tasks) counts[t.status]++;
+  console.log(`tasks: ${col(counts.open + ' open', 'open')} · ${col(counts.claimed + ' claimed', 'claimed')} · ${col(counts.done + ' done', 'done')}`);
+}
+
+// ── dispatch ──────────────────────────────────────────────────────────────
+const dispatch = { list: cmdList, claim: cmdClaim, done: cmdDone, add: cmdAdd, status: cmdStatus };
+const fn = dispatch[cmd];
+if (!fn) {
+  console.error('usage: task <list|claim|done|add|status> [args]');
+  console.error('  list   [--mine agent-N] [--open]');
+  console.error('  claim  <id> --as agent-N');
+  console.error('  done   <id> --as agent-N --result "summary"');
+  console.error('  add    "<title>" --needs /skill [--estimate N]');
+  console.error('  status');
+  process.exit(2);
+}
+fn();
