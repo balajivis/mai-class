@@ -24,6 +24,30 @@ log:
     entry: shim-58761 exited
   - ts: 2026-05-10T01:06:25Z
     entry: shim-58762 exited
+  - ts: 2026-05-10T01:20:35Z
+    entry: shim-59208 exited
+  - ts: 2026-05-10T01:20:35Z
+    entry: shim-59207 exited
+  - ts: 2026-05-10T01:20:35Z
+    entry: shim-59209 exited
+  - ts: 2026-05-10T01:22:33Z
+    entry: shim-59528 exited
+  - ts: 2026-05-10T01:22:33Z
+    entry: shim-59549 exited
+  - ts: 2026-05-10T01:22:33Z
+    entry: shim-59529 exited
+  - ts: 2026-05-10T01:29:45Z
+    entry: shim-59794 exited
+  - ts: 2026-05-10T01:29:45Z
+    entry: shim-59776 exited
+  - ts: 2026-05-10T01:29:45Z
+    entry: shim-59792 exited
+  - ts: 2026-05-10T01:35:33Z
+    entry: shim-60636 exited
+  - ts: 2026-05-10T01:35:33Z
+    entry: shim-60637 exited
+  - ts: 2026-05-10T01:35:33Z
+    entry: shim-60652 exited
 transports:
   shim-57593: null
   shim-58170:
@@ -40,18 +64,30 @@ transports:
   shim-58761: null
   shim-58762: null
   shim-58816: null
-  shim-59209:
+  shim-59209: null
+  shim-59207: null
+  shim-59208: null
+  shim-59549: null
+  shim-59528: null
+  shim-59529: null
+  shim-59776: null
+  shim-59794: null
+  shim-59792: null
+  shim-60652: null
+  shim-60636: null
+  shim-60637: null
+  shim-61112:
     status: active
-    last_seen: 2026-05-10T01:18:40Z
-    port: 59209
+    last_seen: 2026-05-10T01:35:38Z
+    port: 61112
     gemini: disabled
-  shim-59207:
+  shim-61127:
     status: active
-    last_seen: 2026-05-10T01:18:40Z
-    port: 59207
+    last_seen: 2026-05-10T01:35:38Z
+    port: 61127
     gemini: disabled
-  shim-59208:
+  shim-61111:
     status: active
-    last_seen: 2026-05-10T01:18:40Z
-    port: 59208
+    last_seen: 2026-05-10T01:35:38Z
+    port: 61111
     gemini: disabled

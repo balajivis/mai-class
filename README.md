@@ -8,10 +8,9 @@ The full pedagogical vision lives in [`PROJECT.md`](./PROJECT.md). Read that fir
 
 | Folder | Role in the class |
 |---|---|
-| [`multiagent-primer/`](./multiagent-primer/) | Four short labs that make students *feel* coordination primitives: Lab 0 (single-agent rhythm — bundles gstack), Lab 1 (blackboard), Lab 2 (task allocation), Lab 3 (team design). **Blocks A + B** — the core curriculum. See its [`PROJECT.md`](./PROJECT.md). |
+| [`multiagent-primer/`](./multiagent-primer/) | Four short labs that make students *feel* coordination primitives: Lab 0 (single-agent rhythm — bundles gstack and the SDRAuto sandbox), Lab 1 (blackboard), Lab 2 (task allocation), Lab 3 (team design). **Blocks A + B + F** — the core curriculum and the production reference walk. See its [`PROJECT.md`](./PROJECT.md). |
 | [`openclaw/`](./openclaw/) | Self-hosted agent gateway — connect a Claude/Groq agent to Telegram, WhatsApp, Discord. **Block D** — agents on real channels. |
 | [`brownfield/`](./brownfield/) | Legacy DocVault Java app + a sprints dashboard + a working `board.md`. **Block E capstone** — multi-agent triage on code students didn't write. |
-| [`SDRAuto/`](./SDRAuto/) | A real autonomous-BDR product (read-only reference). **Block F** — what production single-agent systems actually look like. |
 | [`blackboard-classroom/`](./blackboard-classroom/) | The big-exercise classroom server (separate deploy lifecycle). |
 | [`workshop-kit/`](./workshop-kit/) | Instructor-side agents, hooks, MCP servers, monitors. |
 
@@ -21,7 +20,7 @@ The full pedagogical vision lives in [`PROJECT.md`](./PROJECT.md). Read that fir
 2. **Block B — Feel the primitives** (`multiagent-primer/` Labs 1-3) — 90 min
 3. **Block D — Real channel, real human** (`openclaw/`) — 45 min
 4. **Block E — Brownfield triage capstone** (`brownfield/`) — 2 hr
-5. **Block F — Production walk** (`SDRAuto/`) — 30 min
+5. **Block F — Production walk** (`multiagent-primer/lab0-workflow/SDRAuto/`) — 30 min
 
 The four primer labs (0 → 1 → 2 → 3) are designed to be done in sequence — Lab 0 establishes the single-agent baseline, then Lab 1 reveals the coordination problem, then 2 and 3 patch it.
 
@@ -34,4 +33,4 @@ The four primer labs (0 → 1 → 2 → 3) are designed to be done in sequence �
 
 ## License
 
-MIT — see [`LICENSE`](./LICENSE). gstack-practice/gstack is also MIT, © Garry Tan.
+MIT — see [`LICENSE`](./LICENSE). The bundled `multiagent-primer/lab0-workflow/gstack/` is also MIT, © Garry Tan.

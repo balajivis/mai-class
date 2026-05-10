@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# lab1-up.sh — open the 4-pane tmux layout for Lab 1
+# lab1-up.sh — open the tmux layout for Lab 1
 #
-# top-left: live mirror (./bb-watch.sh)
-# other 3 panes: claude (one agent each)
+# window 0 "agents":  bb-watch (top-left) + 3 claude agents (tiled)
+# window 1 "mirror":  bb-serve (web UI on http://localhost:8765/bb-mirror.html)
 #
 # detach: Ctrl-b d        reattach: ./lab1-up.sh
 # tear down: ./lab1-down.sh
@@ -19,10 +19,27 @@ if tmux has-session -t lab1 2>/dev/null; then
   exec tmux attach -t lab1
 fi
 
+# fresh start: archive previous run (if any), then reset blackboard from template
+if [ -s blackboard.md ] && ! cmp -s blackboard.md blackboard.template.md; then
+  mkdir -p runs
+  ts=$(date -u +%Y%m%d-%H%M%SZ)
+  cp blackboard.md "runs/${ts}.md"
+  echo "▶ archived previous run → runs/${ts}.md"
+fi
+cp blackboard.template.md blackboard.md
+echo "▶ blackboard.md reset"
+
+# window 0 — terminal mirror + 3 agents
 tmux new-session  -d -s lab1 -n agents './bb-watch.sh'
 tmux split-window -h -t lab1:0   'claude --model haiku'
 tmux split-window -v -t lab1:0.0 'claude --model haiku'
 tmux split-window -v -t lab1:0.2 'claude --model haiku'
 tmux select-layout -t lab1:0 tiled
+
+# window 1 — web mirror server (auto-opens browser to localhost:8765)
+tmux new-window -t lab1 -n mirror './bb-serve.sh'
+
+# start in the agents window, focused on first claude pane
+tmux select-window -t lab1:0
 tmux select-pane   -t lab1:0.1
 exec tmux attach   -t lab1

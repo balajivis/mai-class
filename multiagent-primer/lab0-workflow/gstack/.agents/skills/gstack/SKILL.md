@@ -585,6 +585,7 @@ Refs are invalidated on navigation — run `snapshot` again after `goto`.
 | Command | Description |
 |---------|-------------|
 | `chain` | Run commands from JSON stdin. Format: [["cmd","arg1",...],...] |
+| `state get <key> | state set <key> <json> | state delete <key> | state list | state clear` | Get, set, or list shared skill state |
 
 ### Tabs
 | Command | Description |

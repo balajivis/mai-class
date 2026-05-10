@@ -152,7 +152,7 @@ After all three labs + big exercise, students have **personally implemented** ~7
 
 | Component | State |
 |---|---|
-| `lab0-workflow/` | ✅ Built 2026-05-09 (bridge README pointing at `../gstack-practice/`) |
+| `lab0-workflow/` | ✅ Built 2026-05-09. Bundles `gstack/` toolkit + `SDRAuto/` sandbox. |
 | `lab1-blackboard/` | ✅ Built and smoke-tested 2026-05-09 |
 | `lab2-task-allocation/` | ⏳ Designed, not built. Needs `CLAUDE.md` + `task-cli/` (~60 LOC Node) |
 | `lab3-team-design/` | ⏳ Designed, not built. Three `CLAUDE.md` variants for three topologies |

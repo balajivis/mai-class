@@ -546,7 +546,7 @@ p{margin:0}
   </div>
 
   <div class="runfoot">
-    <span>Modern AI &amp; Pro · Lab 1</span>
+    <span>Modern AI Pro · Lab 1</span>
     <span>Pillars 1, 4 · Shared State · Result Sharing</span>
     <span>Live mirror · polling 1s</span>
   </div>
@@ -556,7 +556,27 @@ p{margin:0}
 <script>
 const BOARD_URL = 'blackboard.md';
 const POLL_MS = 1000;
-const STALE_SECS = 60;
+const STALE_SECS = 60;            // global "no writes" warning
+const KICK_AGENT_SECS = 300;      // 5 min — drop inactive agents from the UI
+
+// observation state: when WE first saw each finding (don't trust agent-claimed timestamps)
+const seenFindings = new Map();   // key: agent|headline → firstSeenEpoch
+let lastFileMtime = 0;            // epoch from HTTP Last-Modified
+
+function noteFindings(findings){
+  const now = Math.floor(Date.now()/1000);
+  for(const f of findings){
+    const key = f.agent + '|' + f.headline;
+    if(!seenFindings.has(key)) seenFindings.set(key, now);
+  }
+}
+function agentLastSeen(agent){
+  let best = 0;
+  for(const [k, t] of seenFindings){
+    if(k.startsWith(agent + '|') && t > best) best = t;
+  }
+  return best;
+}
 
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -617,16 +637,25 @@ let lastFindingsCount = 0;
 let flashTimer = null;
 
 function render(state){
+  noteFindings(state.findings);
+  const now = Math.floor(Date.now()/1000);
+
   // tick
   $('#tick').textContent = state.findings.length;
 
-  // roster cards
+  // roster cards — hide any agent inactive for >5 min (kicked out)
   for(const slot of ['agent-1','agent-2','agent-3']){
     const card = document.querySelector(`.ks[data-slot="${slot}"]`);
     if(!card) continue;
     const entry = state.roster.find(r => r.name === slot);
     const writes = state.findings.filter(f => f.agent === slot);
     const last = writes.length ? writes[writes.length-1] : null;
+    const lastObserved = agentLastSeen(slot);
+    const agoObserved = lastObserved ? (now - lastObserved) : Infinity;
+
+    // kick out: never wrote AND not even registered, OR inactive >5 min
+    const shouldHide = (!entry && !last) || (lastObserved && agoObserved > KICK_AGENT_SECS);
+    card.style.display = shouldHide ? 'none' : '';
 
     if(entry){
       card.classList.remove('unregistered');
@@ -635,12 +664,10 @@ function render(state){
     card.querySelector('[data-writes]').textContent = writes.length;
     card.querySelector('[data-last]').textContent = last ? last.section : '—';
 
-    // online vs idle: fresh write within 30s
-    const now = Math.floor(Date.now()/1000);
-    if(last){
-      const ago = now - epochOf(last.ts);
-      card.classList.toggle('online', ago < 30);
-      card.classList.toggle('idle', ago > 90);
+    // online vs idle: fresh observed write
+    if(lastObserved){
+      card.classList.toggle('online', agoObserved < 30);
+      card.classList.toggle('idle', agoObserved > 90);
     }
   }
 
@@ -694,18 +721,21 @@ function render(state){
   }
   lastFindingsCount = state.findings.length;
 
-  // last write
+  // last write — use file mtime (honest), fall back to observed-finding epoch
   const last = state.findings.length ? state.findings[state.findings.length-1] : null;
+  const lastEpoch = lastFileMtime || (last ? agentLastSeen(last.agent) : 0);
+  const agoFile = lastEpoch ? (now - lastEpoch) : null;
   if(last){
-    const now = Math.floor(Date.now()/1000);
-    const ago = now - epochOf(last.ts);
     $('#last-write').innerHTML = `<em>${last.agent}</em> · ${last.section}`;
-    $('#last-body').innerHTML = `<b>${ago}s</b> ago · ${last.headline.slice(0,60)}…`;
-    $('#warn-stale').classList.toggle('on', ago > STALE_SECS);
-    $('#stale-secs').textContent = ago;
+    $('#last-body').innerHTML = (agoFile !== null ? `<b>${agoFile}s</b> ago · ` : '') + last.headline.slice(0,60) + '…';
   } else {
     $('#last-write').innerHTML = `<em>—</em> idle`;
     $('#last-body').innerHTML = `Watching <code>blackboard.md</code> · refresh 1s`;
+  }
+  if(agoFile !== null){
+    $('#warn-stale').classList.toggle('on', agoFile > STALE_SECS);
+    $('#stale-secs').textContent = agoFile;
+  } else {
     $('#warn-stale').classList.remove('on');
   }
 
@@ -748,7 +778,13 @@ async function poll(){
     const state = parseBoard(md);
     render(state);
     const lm = r.headers.get('last-modified');
-    $('#last-mtime').textContent = lm ? lm.split(',')[1]?.trim().slice(0,17) : new Date().toLocaleTimeString();
+    if(lm){
+      const d = new Date(lm);
+      if(!isNaN(d.getTime())) lastFileMtime = Math.floor(d.getTime()/1000);
+      $('#last-mtime').textContent = lm.split(',')[1]?.trim().slice(0,17) || lm;
+    } else {
+      $('#last-mtime').textContent = new Date().toLocaleTimeString();
+    }
     $('#conn-status').textContent = 'live · ' + new Date().toLocaleTimeString();
   } catch(e){
     $('#conn-status').textContent = 'offline · ' + e.message;

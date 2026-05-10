@@ -1,0 +1,15 @@
+blackboard:
+  project: multiagent-primer
+  description: Shared state
+agents: {}
+directives: []
+log:
+  - ts: 2026-05-10T01:31:54Z
+    entry: shim-60517 exited
+transports:
+  shim-60517: null
+  shim-60966:
+    status: active
+    last_seen: 2026-05-10T01:37:00Z
+    port: 60966
+    gemini: disabled
