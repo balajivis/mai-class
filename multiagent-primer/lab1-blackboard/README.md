@@ -2,6 +2,7 @@
 
 **Time:** 25 min (5 setup · 15 work · 5 reflect)
 **Lessons it reinforces:** §8 Shared State
+**Where this fits:** first lab of the [multi-agent primer](../). Block B of the [mai-class day](../../README.md). Read `../PROJECT.md` for the full pedagogical thesis.
 
 ---
 
@@ -96,7 +97,7 @@ Once you're in the Ubuntu shell, you can let Claude do the rest:
 
    > Read `task.md`. Register yourself on the roster. Then begin.
 
-   Kick off the first agent, then the next two within ~10 seconds (so they all start with an empty roster and race for `agent-1`).
+   Stagger the three kick-offs by **~5 seconds each**. Simultaneous starts make all three claim `agent-1`; gaps longer than ~15s let the first agent finish too much before the others wake up. Five seconds is the sweet spot.
 
 ---
 

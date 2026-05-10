@@ -14,7 +14,13 @@ Read `blackboard.md`. Look at the `## Roster` section.
 - Otherwise, take the next free slot (`agent-2`, then `agent-3`).
 - Append a line to the roster with your name and the current `date -u +%FT%TZ`.
 
-Use `cat >> blackboard.md` for atomic appends. **Never use Edit on the roster section** — three agents Editing the same lines will race and lose writes.
+Use `cat >> blackboard.md` for atomic appends — for example:
+
+```bash
+printf -- '- %s · joined %s\n' "agent-N" "$(date -u +%FT%TZ)" >> blackboard.md
+```
+
+**Never use Edit on the roster section** — three agents Editing the same lines will race and lose writes. Append-only is the discipline that keeps the lesson clean.
 
 ### 2. Read the task
 Open `task.md`. The brief has four required sections. Note them.

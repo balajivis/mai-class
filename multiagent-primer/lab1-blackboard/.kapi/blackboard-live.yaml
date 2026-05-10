@@ -18,6 +18,12 @@ log:
     entry: shim-58469 exited
   - ts: 2026-05-10T00:46:41Z
     entry: shim-58470 exited
+  - ts: 2026-05-10T01:06:25Z
+    entry: shim-58816 exited
+  - ts: 2026-05-10T01:06:25Z
+    entry: shim-58761 exited
+  - ts: 2026-05-10T01:06:25Z
+    entry: shim-58762 exited
 transports:
   shim-57593: null
   shim-58170:
@@ -31,3 +37,6 @@ transports:
   shim-58467: null
   shim-58469: null
   shim-58470: null
+  shim-58761: null
+  shim-58762: null
+  shim-58816: null
