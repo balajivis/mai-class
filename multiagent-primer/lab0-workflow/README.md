@@ -47,7 +47,7 @@ You need a small repo to act on. Pick **one**:
 | Sandbox | Path | Notes |
 |---|---|---|
 | **SDRAuto** *(default)* | `./SDRAuto/` | A real Node/TS BDR product. **Read-only — do not push.** Drop a small fix, run `/ship` *without* the actual push, then revert. |
-| Brownfield DocVault *(optional)* | `../../brownfield/docvault-legacy/` | Legacy Java app with a published bug list in `REVIEW.yaml`. Pick one bug and walk it through. |
+| DocVault Legacy *(alt — Java)* | `./docvault-legacy/` | Fake-but-realistic legacy Spring/Java app with a published bug list in `REVIEW.yaml` and `TODO.md`. Pick one bug and walk it through. Good choice if you'd rather work in Java than TypeScript. |
 | Your own repo | anywhere on your laptop | < 5k LOC ideally |
 
 ### Step 3 — Open one Claude Code session in that sandbox

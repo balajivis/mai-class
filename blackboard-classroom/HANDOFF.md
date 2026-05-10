@@ -16,7 +16,7 @@ The build was **state-of-the-art** with respect to recent Claude Code features: 
 ```
 /Users/bv/Code/mai-class/
 ├── blackboard-classroom/      ← Node/Express/SQLite/SSE server. Deploys to bb.modernaipro.com.
-└── workshop-kit/              ← Claude Code plugin. Distributed via `claude plugins install Kapi-IDE/workshop-kit`.
+└── workshop-kit/              ← Claude Code plugin. Distributed via `/plugin marketplace add Kapi-IDE/workshop-kit && /plugin install workshop-kit@mai-workshop`.
 ```
 
 `blackboard-classroom` is the server; `workshop-kit` is what every student installs locally to participate.
@@ -43,7 +43,7 @@ The build was **state-of-the-art** with respect to recent Claude Code features: 
 |---|---|---|
 | **Pillar #6 Negotiation** (proper conflict-resolution flow when bids collide) | Time-boxed; current Mode C does highest-bid-wins; full §6 wants explicit negotiation rounds | ~1 hr |
 | **Pillar #8 Cross-session memory** (`SessionStart` hook pulls last-known agent state from blackboard) | Plugin hook is registered but doesn't do the catch-up read yet | ~1 hr |
-| **Plugin distribution to GitHub** | The plugin lives at `workshop-kit/`. To enable `claude plugins install Kapi-IDE/workshop-kit`, the dir needs to be its own git repo at github.com/Kapi-IDE/workshop-kit | ~30 min (git subtree split + push) |
+| **Plugin distribution to GitHub** | The plugin lives at `workshop-kit/`. To enable `/plugin marketplace add Kapi-IDE/workshop-kit && /plugin install workshop-kit@mai-workshop`, the dir needs to be its own git repo at github.com/Kapi-IDE/workshop-kit | ~30 min (git subtree split + push) |
 | **Friendly dry-run** with 3 volunteers, 1 project, 30 min | Not yet executed | n/a |
 | **Real prod deploy** (DNS + nginx + first PM2 start) | Per MAI rules, the user must trigger this; artefacts are ready | n/a |
 | **Topology graph in *team* dashboard** (currently only in master) | Lower priority; team feed shows agent dynamics through activity feed alone | ~1 hr |
@@ -91,11 +91,13 @@ export WK_TOKEN=team1-XXXXXXXXXXXX     # your real team1 token from `npm run tok
 export WK_AGENT=alice-frontend
 export CLAUDE_PLUGIN_ROOT=/Users/bv/Code/mai-class/workshop-kit  # for hook/monitor scripts that interpolate this
 
-# Either: install the plugin (preferred path)
-claude plugins install /Users/bv/Code/mai-class/workshop-kit
-
-# Or: tell claude to use the plugin dir directly
+# Easiest: ad-hoc, no install
 claude --plugin-dir /Users/bv/Code/mai-class/workshop-kit --agent frontend
+
+# Or, full marketplace install (validates the production install flow):
+#   inside `claude`:  /plugin marketplace add /Users/bv/Code/mai-class/workshop-kit
+#                     /plugin install workshop-kit@mai-workshop
+# then restart `claude` and run `--agent frontend`.
 ```
 
 Watch the dashboard. Statusline should show `🤖 alice-frontend · team1 · tasks 0 · BB🟢` and tool-uses should appear in the activity feed within ~1s.
@@ -191,7 +193,17 @@ Key invariant: the **server never executes commands on student machines**. It co
 5. **better-sqlite3 + native build**. The package builds a native addon on `npm install`. On a fresh kapi-prod, ensure `python3` + `make` + `g++` are present. The first deploy will fail loudly if not.
 6. **SSE through nginx**. The DEPLOY.md vhost includes `proxy_buffering off` + `proxy_read_timeout 24h` — both are required. If SSE silently disconnects in prod, that's the first thing to check.
 7. **Hook is fire-and-forget**. `bin/post-event.sh` swallows curl errors so a flaky network never breaks CC. This means students won't see hook failures locally; check the dashboard to confirm telemetry is flowing.
-8. **Plugin distribution**. The plugin currently lives at `/Users/bv/Code/mai-class/workshop-kit/`. To make `claude plugins install Kapi-IDE/workshop-kit` work, that dir needs to become its own git repo at `github.com/Kapi-IDE/workshop-kit`. Use `git subtree split --prefix=workshop-kit -b workshop-kit-only` from a git-init'd parent, then push that branch as the new repo's main.
+8. **Plugin distribution**. Plugins do **not** install from arbitrary git URLs — Claude Code requires a marketplace manifest. `workshop-kit/.claude-plugin/marketplace.json` (marketplace name: `mai-workshop`, plugin name: `workshop-kit`) is in place and validates clean (`claude plugins validate /Users/bv/Code/mai-class/workshop-kit`). To publish:
+   ```bash
+   cd /Users/bv/Code/mai-class/workshop-kit
+   git init && git add -A && git commit -m "Initial: workshop-kit plugin v0.1.0"
+   gh repo create Kapi-IDE/workshop-kit --public --source=. --push
+   ```
+   Then students run inside `claude`:
+   ```
+   /plugin marketplace add Kapi-IDE/workshop-kit
+   /plugin install workshop-kit@mai-workshop
+   ```
 
 ## What to do next, in order
 

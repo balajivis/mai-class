@@ -43,12 +43,15 @@ render() {
   now=$(date -u +%s)
   hr=$(date -u +%TZ)
 
+  count() { grep -c "$1" "$BOARD" 2>/dev/null | head -1 | tr -dc '0-9' ; }
+  count_default0() { local n; n=$(count "$1"); echo "${n:-0}" ; }
+
   roster=$(awk '/^- agent-/ { gsub(/^- /, ""); print $1 }' "$BOARD" | sort -u)
-  findings=$(grep -c '^### \[agent-' "$BOARD" 2>/dev/null || echo 0)
-  s_setup=$( grep -c '^\*\*Section:\*\* Setup'        "$BOARD" 2>/dev/null || echo 0)
-  s_emer=$(  grep -c '^\*\*Section:\*\* Emergent'     "$BOARD" 2>/dev/null || echo 0)
-  s_lim=$(   grep -c '^\*\*Section:\*\* Limitations'  "$BOARD" 2>/dev/null || echo 0)
-  s_impl=$(  grep -c '^\*\*Section:\*\* Implications' "$BOARD" 2>/dev/null || echo 0)
+  findings=$(count_default0 '^### \[agent-')
+  s_setup=$( count_default0 '^\*\*Section:\*\* Setup')
+  s_emer=$(  count_default0 '^\*\*Section:\*\* Emergent')
+  s_lim=$(   count_default0 '^\*\*Section:\*\* Limitations')
+  s_impl=$(  count_default0 '^\*\*Section:\*\* Implications')
 
   last_line=$(grep '^### \[agent-' "$BOARD" | tail -1 || true)
   last_agent=""; ago=""

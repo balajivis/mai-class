@@ -29,9 +29,14 @@ This prints 5 fresh team tokens. Save them; email each enrolled student their te
 
 - Project assignments randomised on whiteboard (which team gets which of: tiny-crm-cli, pokemon-combat-engine, markdown-static-site-gen, tiny-task-queue, refactor-spaghetti-500loc)
 - Each team picks a corner / table
-- Walk students through:
-  1. `claude plugins install Kapi-IDE/workshop-kit`
-  2. `export WK_*` (project for them on slide)
+- Walk students through (slide):
+  1. Inside `claude` shell:
+     ```
+     /plugin marketplace add Kapi-IDE/workshop-kit
+     /plugin install workshop-kit@mai-workshop
+     ```
+     then quit + relaunch `claude` so hooks/monitors activate.
+  2. `export WK_API WK_TEAM WK_TOKEN WK_AGENT` (slide gives project-specific values)
   3. `claude --agent frontend` (statusline should show 🟢)
 - Open dashboard projector. Brief everyone: *"All you do is post tasks, claim tasks, and watch what happens. No PM. No coordinator. The blackboard is the medium."*
 

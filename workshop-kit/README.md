@@ -18,11 +18,24 @@ A Claude Code **plugin**. After installing it, your `claude` CLI gains:
 
 ## Install
 
-```bash
-claude plugins install Kapi-IDE/workshop-kit
+Two commands, **inside your `claude` shell** (slash commands, not bash):
+
+```text
+/plugin marketplace add Kapi-IDE/workshop-kit
+/plugin install workshop-kit@mai-workshop
 ```
 
-(or, during workshop dev: `claude plugins install ./workshop-kit` from a clone)
+The first registers this repo as a Claude Code marketplace; the second installs the plugin from it. Quit and relaunch `claude` after install so the agents, hooks, monitors, statusline, MCP, and skills all activate.
+
+### Alternative · zero-install (one session)
+
+```bash
+git clone https://github.com/Kapi-IDE/workshop-kit.git
+cd /path/to/your/team-project
+claude --plugin-dir /path/to/workshop-kit
+```
+
+`--plugin-dir` loads the plugin for that one session only — nothing is registered globally. Useful for quick tests.
 
 ## Configure
 

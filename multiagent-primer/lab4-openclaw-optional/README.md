@@ -16,7 +16,7 @@ In Lab 4 you wire one agent to a real Telegram bot and message it from your phon
 2. **HITL is a graduated thing, not a checkbox.** Who can talk to the bot? Whose messages does it act on? When does it escalate to a human?
 3. **The same agent feels different on a real channel.** What read fine in a terminal pane reads as terse, slow, or alarming in Telegram.
 
-This is also the bridge from the primer to the rest of the mai-class day — every later block (brownfield, blackboard-classroom) assumes you've at least *seen* what an agent on a real channel looks like.
+This is also the bridge from the primer to the larger blackboard-classroom big exercise — that exercise assumes you've at least *seen* what an agent on a real channel looks like.
 
 ---
 
@@ -99,7 +99,7 @@ On paper, in one sentence each:
 2. **Where would a malicious or careless message break your bot?** Be specific.
 3. **What do you now believe about HITL that you didn't before this lab?**
 
-Hold onto your answer to question 2. It maps directly to the **Block E brownfield capstone**, where governance and trust become structural, not optional.
+Hold onto your answer to question 2. It maps directly to the **blackboard-classroom big exercise**, where governance and trust become structural, not optional.
 
 ---
 
@@ -134,4 +134,4 @@ For deeper troubleshooting see [`./openclaw/CLAUDE.md`](./openclaw/CLAUDE.md).
 
 ---
 
-## Then proceed to the bonus or to Block E (brownfield).
+## Then proceed to the bonus or to the blackboard-classroom big exercise.

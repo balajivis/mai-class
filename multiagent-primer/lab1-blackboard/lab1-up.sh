@@ -39,6 +39,19 @@ tmux select-layout -t lab1:0 tiled
 # window 1 — web mirror server (auto-opens browser to localhost:8765)
 tmux new-window -t lab1 -n mirror './bb-serve.sh'
 
+# auto-kickoff: paste the prompt into each agent pane after claude is ready,
+# staggered by 5s so they don't all race for agent-1. Runs in background while
+# the user is attaching, so they see the prompts type themselves in.
+KICKOFF='Read task.md. Register yourself on the roster. Then begin.'
+(
+  sleep 8                                                          # claude warmup
+  for pane in 1 2 3; do
+    tmux send-keys -t "lab1:0.${pane}" "$KICKOFF"
+    tmux send-keys -t "lab1:0.${pane}" Enter
+    sleep 5
+  done
+) >/dev/null 2>&1 &
+
 # start in the agents window, focused on first claude pane
 tmux select-window -t lab1:0
 tmux select-pane   -t lab1:0.1
