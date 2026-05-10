@@ -54,3 +54,6 @@ venv/
 .gh-msg-map
 .gh-offset
 ecosystem.config.cjs.local
+
+# MCP blackboard runtime state (heartbeat-updated, not source)
+**/.kapi/blackboard-live.yaml
