@@ -2,13 +2,13 @@
 
 Course materials for **Modern AI Pro** — a live, hands-on class on multi-agent systems for senior professionals.
 
-The full pedagogical vision lives in [`PROJECT.md`](./PROJECT.md). Read that first.
+The pedagogical vision and 16-pillar mapping live in [`multiagent-primer/PROJECT.md`](./multiagent-primer/PROJECT.md). For the student entry point, read [`multiagent-primer/README.md`](./multiagent-primer/README.md).
 
 ## What's in here
 
 | Folder | Role in the class |
 |---|---|
-| [`multiagent-primer/`](./multiagent-primer/) | The core curriculum. Five labs: Lab 0 (single-agent rhythm — bundles gstack, SDRAuto, and a Java legacy sandbox), Lab 1 (blackboard), Lab 2 (task allocation), Lab 3 (team design), Lab 4 *optional* (openclaw — agents on real channels). **Blocks A + B + D + F**. See its [`PROJECT.md`](./PROJECT.md). |
+| [`multiagent-primer/`](./multiagent-primer/) | The core curriculum. Five labs (0 → 1 → 2 → 3 → 4-optional). **Blocks A + B + D + F**. See its [`README.md`](./multiagent-primer/README.md) for the lab list and [`PROJECT.md`](./multiagent-primer/PROJECT.md) for the design rationale. |
 | [`blackboard-classroom/`](./blackboard-classroom/) | The big-exercise classroom server (separate deploy lifecycle). |
 | [`workshop-kit/`](./workshop-kit/) | Instructor-side agents, hooks, MCP servers, monitors. |
 

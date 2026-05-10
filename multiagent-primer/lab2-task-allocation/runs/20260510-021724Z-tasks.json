@@ -1,11 +1,13 @@
 {
-  "version": 1,
+  "version": 3,
   "brief": "SDRAuto sprint backlog — 8 tasks, 2 agent-rounds. Round 2: first-claim. Round 3: capability-aware (contract-net).",
   "tasks": [
     {
       "id": "T-01",
       "title": "Review sandbox/auth.ts for security and correctness",
-      "needs": ["/review"],
+      "needs": [
+        "/review"
+      ],
       "estimate_min": 3,
       "output": "outputs/T-01-review.yaml",
       "status": "open",
@@ -17,19 +19,23 @@
     {
       "id": "T-02",
       "title": "Investigate why login_flaky_test fails 1 in 5 runs",
-      "needs": ["/investigate"],
+      "needs": [
+        "/investigate"
+      ],
       "estimate_min": 3,
       "output": "outputs/T-02-investigation.md",
-      "status": "open",
-      "claimed_by": null,
-      "claimed_at": null,
-      "completed_at": null,
-      "result": null
+      "status": "done",
+      "claimed_by": "agent-1",
+      "claimed_at": "2026-05-10T02:11:54.453Z",
+      "completed_at": "2026-05-10T02:11:54.513Z",
+      "result": "stub"
     },
     {
       "id": "T-03",
       "title": "Plan the tech-debt sprint: scope, sequence, risks",
-      "needs": ["/plan-eng-review"],
+      "needs": [
+        "/plan-eng-review"
+      ],
       "estimate_min": 4,
       "output": "outputs/T-03-plan.md",
       "status": "open",
@@ -41,7 +47,9 @@
     {
       "id": "T-04",
       "title": "QA the signup flow: enumerate test cases & edge cases",
-      "needs": ["/qa"],
+      "needs": [
+        "/qa"
+      ],
       "estimate_min": 3,
       "output": "outputs/T-04-qa.md",
       "status": "open",
@@ -53,7 +61,9 @@
     {
       "id": "T-05",
       "title": "Draft release notes for the v1.4 ship",
-      "needs": ["/document-release"],
+      "needs": [
+        "/document-release"
+      ],
       "estimate_min": 3,
       "output": "outputs/T-05-release.md",
       "status": "open",
@@ -65,7 +75,9 @@
     {
       "id": "T-06",
       "title": "Write the weekly retro: what shipped, what blocked, what to fix",
-      "needs": ["/retro"],
+      "needs": [
+        "/retro"
+      ],
       "estimate_min": 3,
       "output": "outputs/T-06-retro.md",
       "status": "open",
@@ -77,7 +89,9 @@
     {
       "id": "T-07",
       "title": "Review sandbox/api.ts: error handling, types, edge cases",
-      "needs": ["/review"],
+      "needs": [
+        "/review"
+      ],
       "estimate_min": 3,
       "output": "outputs/T-07-review.yaml",
       "status": "open",
@@ -89,7 +103,9 @@
     {
       "id": "T-08",
       "title": "Investigate the reported memory leak in long-running workers",
-      "needs": ["/investigate"],
+      "needs": [
+        "/investigate"
+      ],
       "estimate_min": 4,
       "output": "outputs/T-08-investigation.md",
       "status": "open",

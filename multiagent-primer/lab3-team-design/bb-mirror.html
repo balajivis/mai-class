@@ -1,0 +1,815 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lab 3 — Team Design · Live Mirror</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Inter+Tight:wght@300;400;450;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0B0B0C; --ink-2:#1C1C1E; --ink-3:#3A3A3C;
+  --line:#D8D6D0; --line-soft:#E6E4DD;
+  --paper:#F4F2EC; --paper-2:#ECEAE3; --paper-card:#FBFAF6;
+  --muted:#6B6B6B; --muted-2:#8A8A86;
+  --accent:#8B2E1F; --accent-2:#B8674F; --accent-soft:#C58A75;
+  --teal:#2F5D62; --gold:#B08A3E; --olive:#5C6F3A;
+  --warn:#B8861F;
+  --serif:'Newsreader', 'Times New Roman', Georgia, serif;
+  --sans:'Inter Tight', ui-sans-serif, system-ui, -apple-system, Helvetica, Arial, sans-serif;
+  --mono:'JetBrains Mono', ui-monospace, Menlo, monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:#2a2722;
+  color:var(--ink);
+  font-family:var(--serif);
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:"ss01","onum","liga";
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:24px 16px;
+}
+em{font-style:italic;color:var(--accent)}
+h1,h2,h3,h4,h5,h6{margin:0;font-family:var(--serif);font-weight:500;letter-spacing:-0.012em;line-height:1.05}
+p{margin:0}
+
+.frame{
+  width:1400px;max-width:100%;
+  background:var(--paper);color:var(--ink);
+  display:flex;flex-direction:column;
+  box-shadow:0 30px 80px rgba(0,0,0,0.45);
+}
+.runhead,.runfoot{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:14px 64px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:0.22em;
+  text-transform:uppercase;color:var(--muted);
+}
+.runhead{border-bottom:1px solid var(--line)}
+.runfoot{border-top:1px solid var(--line)}
+.rh-mark{font-family:var(--serif);font-style:italic;font-weight:500;font-size:14px;letter-spacing:0;text-transform:none;color:var(--ink)}
+.rh-mark .amp{color:var(--accent)}
+
+.head{
+  display:grid;grid-template-columns:130px 1fr auto;
+  gap:36px;align-items:end;
+  padding:28px 64px 22px;border-bottom:2px solid var(--ink);
+}
+.head .num-lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.22em;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:6px}
+.head .num{font-family:var(--serif);font-style:italic;font-size:96px;font-weight:400;color:var(--accent);letter-spacing:-0.04em;line-height:0.88}
+.head h1{font-family:var(--serif);font-size:60px;font-weight:400;letter-spacing:-0.022em;line-height:0.95}
+.head .sub{font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink-2);line-height:1.4;margin-top:12px;max-width:62ch;text-wrap:pretty}
+.head .meta{
+  text-align:right;font-family:var(--mono);font-size:10.5px;letter-spacing:0.22em;
+  color:var(--muted);text-transform:uppercase;line-height:1.7;white-space:nowrap;
+}
+.head .meta strong{display:block;font-family:var(--serif);font-style:italic;font-weight:400;font-size:24px;color:var(--ink);letter-spacing:-0.01em;text-transform:none;margin-bottom:4px}
+
+/* legend / status bar */
+.legend{
+  display:flex;align-items:center;gap:28px;
+  padding:14px 64px;
+  border-bottom:1px solid var(--line);
+  font-family:var(--mono);font-size:10.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);
+  background:var(--paper-2);
+  flex-wrap:wrap;
+}
+.legend .item{display:flex;align-items:center;gap:8px}
+.legend .swatch{width:10px;height:10px;border-radius:50%}
+.legend .swatch.read{background:var(--teal)}
+.legend .swatch.write{background:var(--accent)}
+.legend .swatch.dup{background:var(--warn)}
+.legend .controls{margin-left:auto;display:flex;gap:14px;align-items:center}
+.legend .tick-meter{
+  font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink);
+  text-transform:none;letter-spacing:-0.005em;
+  display:flex;align-items:baseline;gap:8px;
+}
+.legend .tick-meter b{color:var(--accent);font-weight:400}
+.legend .tick-meter span{font-family:var(--mono);font-size:9.5px;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase}
+.warn-banner{
+  display:none;align-items:center;gap:8px;
+  padding:7px 12px;border:1px solid var(--warn);background:rgba(184,134,31,0.08);
+  font-family:var(--mono);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--warn);
+}
+.warn-banner.on{display:flex}
+
+/* stage */
+.stage{
+  display:grid;
+  grid-template-columns:240px 1fr 240px;
+  gap:0;
+  padding:28px 64px 14px;
+  position:relative;
+  min-height:560px;
+}
+.col-side{
+  display:flex;flex-direction:column;gap:10px;
+  padding-top:34px;
+}
+.col-side .col-head{
+  font-family:var(--mono);font-size:10px;letter-spacing:0.22em;color:var(--muted);text-transform:uppercase;
+  padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:6px;
+}
+.col-side .col-head em{color:var(--accent);font-style:italic;font-family:var(--serif);text-transform:none;letter-spacing:0;font-size:13px}
+
+/* knowledge-source (agent) cards */
+.ks{
+  background:var(--paper-card);
+  border:1px solid var(--line);
+  padding:12px 12px 11px;
+  position:relative;
+  transition:all .25s cubic-bezier(.2,.7,.2,1);
+}
+.ks.firing{
+  border-color:var(--accent);border-width:1.5px;
+  background:rgba(139,46,31,0.05);
+  box-shadow:0 0 0 4px rgba(139,46,31,0.08);
+}
+.ks.idle{opacity:0.45}
+.ks.unregistered{opacity:0.3;border-style:dashed}
+.ks .ks-row{display:flex;align-items:center;gap:10px}
+.ks .ks-icon{
+  width:32px;height:32px;border-radius:50%;
+  display:grid;place-items:center;
+  font-family:var(--serif);font-style:italic;font-size:15px;
+  color:var(--paper);background:var(--ink);
+  flex-shrink:0;
+}
+.ks.k1 .ks-icon{background:var(--teal)}
+.ks.k2 .ks-icon{background:var(--accent)}
+.ks.k3 .ks-icon{background:var(--gold)}
+.ks .ks-name{
+  font-family:var(--serif);font-style:italic;font-size:17px;color:var(--ink);font-weight:500;
+  line-height:1.05;
+}
+.ks .ks-tag{
+  display:block;
+  font-family:var(--mono);font-size:9px;letter-spacing:0.18em;color:var(--muted);
+  text-transform:uppercase;margin-top:3px;
+}
+.ks .ks-stats{
+  display:flex;gap:8px;margin-top:10px;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:0.14em;color:var(--muted);text-transform:uppercase;
+}
+.ks .ks-stats .stat{display:inline-flex;align-items:center;gap:5px}
+.ks .ks-stats b{color:var(--ink);font-weight:500;font-family:var(--serif);font-size:13px;letter-spacing:0;text-transform:none}
+.ks .ks-status{
+  position:absolute;top:10px;right:10px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--line);
+}
+.ks.firing .ks-status{
+  background:var(--accent);
+  animation:pulse 1.2s ease-in-out infinite;
+}
+.ks.online .ks-status{background:var(--olive)}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(139,46,31,0.5)}
+  50%{box-shadow:0 0 0 6px rgba(139,46,31,0)}
+}
+
+/* blackboard */
+.bb-wrap{
+  position:relative;
+  padding:34px 22px 0;
+  display:flex;flex-direction:column;
+}
+.bb-title{
+  font-family:var(--mono);font-size:10px;letter-spacing:0.22em;color:var(--muted);text-transform:uppercase;
+  padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:14px;
+  display:flex;justify-content:space-between;align-items:baseline;
+}
+.bb-title em{color:var(--accent);font-style:italic;font-family:var(--serif);text-transform:none;letter-spacing:0;font-size:13px}
+.bb-title .right{font-family:var(--serif);font-style:italic;font-size:13px;color:var(--ink-2);text-transform:none;letter-spacing:0}
+
+.blackboard{
+  background:#0E0F11;
+  background-image:
+    radial-gradient(ellipse at 20% 30%, rgba(255,255,255,0.04), transparent 60%),
+    radial-gradient(ellipse at 80% 70%, rgba(184,103,79,0.05), transparent 60%);
+  border:1px solid var(--ink);
+  position:relative;
+  flex:1;
+  padding:18px;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  grid-auto-rows:minmax(120px,auto);
+  gap:14px;
+  color:#E8E5DD;
+  overflow:hidden;
+}
+.blackboard::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
+  background-size:24px 24px;pointer-events:none;
+}
+.bb-stripe{
+  position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--teal),var(--accent),var(--gold),var(--olive));
+  opacity:.5;
+}
+
+.partition{
+  background:rgba(255,255,255,0.025);
+  border:1px solid rgba(255,255,255,0.10);
+  padding:14px 14px 12px;
+  position:relative;
+  display:flex;flex-direction:column;
+  min-height:0;
+  transition:all .35s cubic-bezier(.2,.7,.2,1);
+}
+.partition.dup{
+  border-color:var(--warn);
+  box-shadow:inset 0 0 0 1px rgba(184,134,31,0.5), 0 0 24px rgba(184,134,31,0.15);
+}
+.partition.flash{
+  border-color:var(--accent-soft);
+  box-shadow:inset 0 0 0 1px rgba(184,103,79,0.45), 0 0 28px rgba(184,103,79,0.18);
+  background:rgba(139,46,31,0.10);
+}
+.partition .p-head{
+  display:flex;justify-content:space-between;align-items:baseline;
+  margin-bottom:10px;padding-bottom:8px;
+  border-bottom:1px dashed rgba(255,255,255,0.16);
+}
+.partition .p-name{
+  font-family:var(--serif);font-style:italic;font-size:18px;font-weight:500;
+  color:#F4F2EC;letter-spacing:-0.005em;
+}
+.partition .p-tag{
+  font-family:var(--mono);font-size:8.5px;letter-spacing:0.22em;text-transform:uppercase;
+  color:rgba(255,255,255,0.45);
+}
+.partition .p-tag b{color:var(--accent-soft);font-weight:400}
+.partition .p-count{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:0.18em;color:rgba(255,255,255,0.55);
+  text-transform:uppercase;
+}
+.partition .p-count em{color:var(--accent-soft);font-family:var(--serif);font-size:13px;text-transform:none;letter-spacing:0}
+
+.entries{
+  display:flex;flex-direction:column;gap:8px;
+  flex:1;min-height:60px;
+  color:rgba(255,255,255,0.92);
+  max-height:280px;overflow-y:auto;
+}
+.entry{
+  display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;gap:2px 10px;
+  padding:9px 11px;
+  background:rgba(0,0,0,0.22);
+  border-left:3px solid rgba(255,255,255,0.18);
+  animation:entryIn .55s cubic-bezier(.2,.7,.2,1);
+}
+.entry .e-tick{
+  grid-row:1;grid-column:1;
+  font-family:var(--mono);font-size:9px;letter-spacing:0.18em;
+  color:rgba(255,255,255,0.45);text-transform:uppercase;white-space:nowrap;
+  align-self:start;padding-top:3px;
+}
+.entry .e-by{
+  grid-row:2;grid-column:1;
+  font-family:var(--mono);font-size:9px;letter-spacing:0.18em;
+  color:var(--accent-soft);text-transform:uppercase;white-space:nowrap;
+  align-self:start;
+}
+.entry .e-text{
+  grid-row:1 / span 2;grid-column:2;
+  color:#F4F2EC;
+  font-family:var(--serif);font-style:italic;font-size:14.5px;font-weight:400;
+  line-height:1.35;letter-spacing:-0.005em;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.entry .e-text b{color:#fff;font-weight:500;font-style:normal}
+.entry.k1{border-left-color:var(--teal)}
+.entry.k1 .e-by{color:#7FB7BD}
+.entry.k2{border-left-color:var(--accent)}
+.entry.k2 .e-by{color:var(--accent-soft)}
+.entry.k3{border-left-color:var(--gold)}
+.entry.k3 .e-by{color:#D9B968}
+@keyframes entryIn{
+  from{opacity:0;transform:translateY(-6px) scale(.98)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.partition .empty{
+  font-family:var(--serif);font-style:italic;font-size:13px;
+  color:rgba(255,255,255,0.32);
+  display:grid;place-items:center;flex:1;min-height:60px;
+}
+
+/* control / status strip */
+.control{
+  margin:0 64px;
+  background:var(--paper-card);
+  border:1px solid var(--line);
+  border-top:2px solid var(--ink);
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  align-items:stretch;
+}
+.control .ctrl-cell{
+  padding:18px 22px;
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:6px;
+}
+.control .ctrl-cell:last-child{border-right:0}
+.control .ctrl-cell .lbl{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:0.22em;color:var(--muted);text-transform:uppercase;
+}
+.control .ctrl-cell .v{
+  font-family:var(--serif);font-style:italic;font-size:24px;color:var(--ink);line-height:1.2;
+}
+.control .ctrl-cell .v em{color:var(--accent)}
+.control .ctrl-cell .body{
+  font-family:var(--sans);font-size:11.5px;line-height:1.5;color:var(--ink-2);margin-top:2px;
+}
+.control .ctrl-cell .body b{color:var(--accent);font-weight:500}
+
+/* explainer */
+.explain{
+  display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:32px;
+  padding:22px 64px 28px;border-top:1px solid var(--line);
+  margin-top:14px;
+}
+.explain .lede{
+  font-family:var(--serif);font-size:18px;line-height:1.5;color:var(--ink);text-wrap:pretty;
+  font-weight:400;
+  border-left:2px solid var(--accent);padding-left:18px;
+}
+.explain .lede em{font-style:italic;color:var(--accent)}
+.explain .lede strong{font-weight:500}
+.explain .col h6{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:0.22em;color:var(--muted);text-transform:uppercase;
+  padding-bottom:8px;margin-bottom:10px;border-bottom:1px solid var(--line);
+}
+.explain .col h6 em{color:var(--accent);font-style:italic;font-family:var(--serif);text-transform:none;letter-spacing:0;font-size:12px}
+.explain .col p{
+  font-family:var(--sans);font-size:12.5px;line-height:1.55;color:var(--ink-2);
+}
+.explain .col p + p{margin-top:8px}
+.explain .col code{font-family:var(--mono);font-size:11px;color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div class="frame" id="frame">
+
+  <div class="runhead">
+    <span id="round-label">Lab 03 · Team Design</span>
+    <span class="rh-mark">Modern AI <span class="amp">&amp;</span> Pro</span>
+    <span id="conn-status">— connecting —</span>
+  </div>
+
+  <div class="head">
+    <div>
+      <span class="num-lbl">§ Lab</span>
+      <span class="num">III.</span>
+    </div>
+    <div>
+      <h1>Same task, three <em>topologies.</em></h1>
+      <p class="sub">Supervisor · pipeline · swarm. Same brief, three org charts. Watch the partitions fill differently and the pain modes shift. <em>The contrast is the lesson.</em></p>
+    </div>
+    <div class="meta">
+      <strong id="task-title">Lisbon trip brief</strong>
+      Multi-Agent Primer · Lab 3
+    </div>
+  </div>
+
+  <!-- LEGEND / STATUS -->
+  <div class="legend">
+    <div class="item"><span class="swatch read"></span><span>Online agent</span></div>
+    <div class="item"><span class="swatch write"></span><span>Just wrote</span></div>
+    <div class="item"><span class="swatch dup"></span><span>Duplicate</span></div>
+    <div class="warn-banner" id="warn-stale">💤 idle · no writes for <b id="stale-secs">0</b>s</div>
+    <div class="warn-banner" id="warn-synth" style="border-color:var(--olive);background:rgba(92,111,58,0.08);color:var(--olive)">✓ synthesis posted</div>
+    <div class="controls">
+      <span class="tick-meter">findings · <b id="tick">0</b><span>posted</span></span>
+    </div>
+  </div>
+
+  <!-- STAGE -->
+  <div class="stage">
+
+    <!-- LEFT: agents 1 & 2 -->
+    <aside class="col-side">
+      <div class="col-head">Agents <em>i.</em></div>
+      <div class="ks k1 unregistered" data-slot="agent-1">
+        <div class="ks-status"></div>
+        <div class="ks-row">
+          <div class="ks-icon">1</div>
+          <div>
+            <div class="ks-name" data-name>agent-1</div>
+            <span class="ks-tag" data-joined>not joined</span>
+          </div>
+        </div>
+        <div class="ks-stats">
+          <span class="stat">writes <b data-writes>0</b></span>
+          <span class="stat">last <b data-last>—</b></span>
+        </div>
+      </div>
+      <div class="ks k2 unregistered" data-slot="agent-2">
+        <div class="ks-status"></div>
+        <div class="ks-row">
+          <div class="ks-icon">2</div>
+          <div>
+            <div class="ks-name" data-name>agent-2</div>
+            <span class="ks-tag" data-joined>not joined</span>
+          </div>
+        </div>
+        <div class="ks-stats">
+          <span class="stat">writes <b data-writes>0</b></span>
+          <span class="stat">last <b data-last>—</b></span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER: blackboard -->
+    <div class="bb-wrap">
+      <div class="bb-title">
+        <span>Blackboard <em>— four required sections</em></span>
+        <span class="right">append-only · <span id="last-mtime">—</span></span>
+      </div>
+      <div class="blackboard" id="blackboard">
+        <div class="bb-stripe"></div>
+
+        <div class="partition" data-part="Transport">
+          <div class="p-head">
+            <div>
+              <div class="p-name">Transport</div>
+              <div class="p-tag">Partition · <b>α</b> · flights &amp; transfers</div>
+            </div>
+            <div class="p-count">entries · <em data-count>0</em></div>
+          </div>
+          <div class="entries" data-entries>
+            <div class="empty">— awaiting entries —</div>
+          </div>
+        </div>
+
+        <div class="partition" data-part="Lodging">
+          <div class="p-head">
+            <div>
+              <div class="p-name">Lodging</div>
+              <div class="p-tag">Partition · <b>β</b> · neighbourhood &amp; stay</div>
+            </div>
+            <div class="p-count">entries · <em data-count>0</em></div>
+          </div>
+          <div class="entries" data-entries>
+            <div class="empty">— awaiting entries —</div>
+          </div>
+        </div>
+
+        <div class="partition" data-part="Activities">
+          <div class="p-head">
+            <div>
+              <div class="p-name">Activities</div>
+              <div class="p-tag">Partition · <b>γ</b> · day plan &amp; meals</div>
+            </div>
+            <div class="p-count">entries · <em data-count>0</em></div>
+          </div>
+          <div class="entries" data-entries>
+            <div class="empty">— awaiting entries —</div>
+          </div>
+        </div>
+
+        <div class="partition" data-part="Budget">
+          <div class="p-head">
+            <div>
+              <div class="p-name">Budget</div>
+              <div class="p-tag">Partition · <b>δ</b> · running totals · €1500 cap</div>
+            </div>
+            <div class="p-count">entries · <em data-count>0</em></div>
+          </div>
+          <div class="entries" data-entries>
+            <div class="empty">— awaiting entries —</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: agent 3 + synthesis status -->
+    <aside class="col-side">
+      <div class="col-head">More <em>ii.</em></div>
+      <div class="ks k3 unregistered" data-slot="agent-3">
+        <div class="ks-status"></div>
+        <div class="ks-row">
+          <div class="ks-icon">3</div>
+          <div>
+            <div class="ks-name" data-name>agent-3</div>
+            <span class="ks-tag" data-joined>not joined</span>
+          </div>
+        </div>
+        <div class="ks-stats">
+          <span class="stat">writes <b data-writes>0</b></span>
+          <span class="stat">last <b data-last>—</b></span>
+        </div>
+      </div>
+      <div class="ks unregistered" id="synth-card">
+        <div class="ks-status"></div>
+        <div class="ks-row">
+          <div class="ks-icon">★</div>
+          <div>
+            <div class="ks-name">Synthesis</div>
+            <span class="ks-tag">Final brief</span>
+          </div>
+        </div>
+        <div class="ks-stats">
+          <span class="stat">status <b id="synth-status">pending</b></span>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- CONTROL / STATUS STRIP -->
+  <div class="control">
+    <div class="ctrl-cell">
+      <span class="lbl">Roster</span>
+      <div class="v"><em id="roster-count">0</em> / 3 agents</div>
+      <div class="body" id="roster-body">No agents have registered yet. They will appear as they post their first line.</div>
+    </div>
+    <div class="ctrl-cell">
+      <span class="lbl">Last write</span>
+      <div class="v" id="last-write"><em>—</em> idle</div>
+      <div class="body" id="last-body">Watching <code>blackboard.md</code> · refresh 1s</div>
+    </div>
+    <div class="ctrl-cell">
+      <span class="lbl">Coverage</span>
+      <div class="v" id="coverage-v"><em>0</em> / 4 sections</div>
+      <div class="body" id="coverage-body">Each section needs ≥2 findings before synthesis.</div>
+    </div>
+  </div>
+
+  <!-- EXPLAINER -->
+  <div class="explain">
+    <p class="lede">
+      Three Claude agents share one <em>blackboard.md.</em> No coordinator, no task list. They <strong>read before write</strong>, post findings with citations, and one of them eventually drafts the synthesis. Duplication, idleness, and the synthesis bottleneck are the lesson — not bugs.
+    </p>
+    <div class="col">
+      <h6>What to <em>watch</em></h6>
+      <p>A <b>highlighted partition</b> means two agents posted to the same section — duplication. A <b>flashing partition</b> means a fresh write just landed.</p>
+      <p>An <b>idle agent</b> (faded card) hasn't written in &gt;60s. The synthesis card lights up green when posted.</p>
+    </div>
+    <div class="col">
+      <h6>The four <em>partitions</em></h6>
+      <p>Transport · Lodging · Activities · Budget. Each round populates these the same way visually, but via a different mechanism: assigned, staged, or scrambled.</p>
+      <p>The active topology lives in <code>CLAUDE.md</code> (symlinked from this round's directory). The contract is the <em>board.</em></p>
+    </div>
+  </div>
+
+  <div class="runfoot">
+    <span>Modern AI Pro · Lab 1</span>
+    <span>Pillars 1, 4 · Shared State · Result Sharing</span>
+    <span>Live mirror · polling 1s</span>
+  </div>
+
+</div>
+
+<script>
+const BOARD_URL = 'blackboard.md';
+const POLL_MS = 1000;
+const STALE_SECS = 60;            // global "no writes" warning
+const KICK_AGENT_SECS = 300;      // 5 min — drop inactive agents from the UI
+
+// observation state: when WE first saw each finding (don't trust agent-claimed timestamps)
+const seenFindings = new Map();   // key: agent|headline → firstSeenEpoch
+let lastFileMtime = 0;            // epoch from HTTP Last-Modified
+
+function noteFindings(findings){
+  const now = Math.floor(Date.now()/1000);
+  for(const f of findings){
+    const key = f.agent + '|' + f.headline;
+    if(!seenFindings.has(key)) seenFindings.set(key, now);
+  }
+}
+function agentLastSeen(agent){
+  let best = 0;
+  for(const [k, t] of seenFindings){
+    if(k.startsWith(agent + '|') && t > best) best = t;
+  }
+  return best;
+}
+
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+
+const SECTIONS = ['Transport','Lodging','Activities','Budget'];
+
+function pad(n){ return String(n).padStart(2,'0'); }
+
+// Parse blackboard.md → { roster:[{name,joined}], findings:[{agent,section,headline,ts}], synthAgent }
+function parseBoard(md){
+  const roster = [];
+  const seen = new Set();
+  const rosterRe = /^- (agent-\d+) · joined ([0-9T:Z\-]+)/gm;
+  let m;
+  while((m = rosterRe.exec(md))){
+    if(!seen.has(m[1])){ seen.add(m[1]); roster.push({name:m[1], joined:m[2]}); }
+  }
+
+  const findings = [];
+  const lines = md.split('\n');
+  for(let i=0; i<lines.length; i++){
+    const l = lines[i];
+    const fm = l.match(/^### \[(agent-\d+) · ([^\]]+)\] (.+)$/);
+    if(fm){
+      const agent = fm[1], ts = fm[2], headline = fm[3];
+      // look ahead for **Section:** line
+      let section = null;
+      for(let j=i+1; j<Math.min(i+5, lines.length); j++){
+        const sm = lines[j].match(/^\*\*Section:\*\*\s*(.+?)\s*$/);
+        if(sm){ section = sm[1].split(/\s/)[0]; break; }
+      }
+      if(section){
+        // normalize: "Emergent behaviours" → "Emergent", "Implications for..." → "Implications"
+        const norm = SECTIONS.find(s => section.toLowerCase().startsWith(s.toLowerCase())) || section;
+        findings.push({agent, section:norm, headline, ts});
+      }
+    }
+  }
+
+  const synthMatch = md.match(/^## SYNTHESIS \(drafted by (agent-\d+)\)/m);
+  const synthAgent = synthMatch ? synthMatch[1] : null;
+
+  return { roster, findings, synthAgent };
+}
+
+function epochOf(ts){
+  // accepts 2026-05-10T00:33:00Z
+  const d = new Date(ts);
+  return isNaN(d.getTime()) ? 0 : Math.floor(d.getTime()/1000);
+}
+
+function agentClass(agent){
+  const n = parseInt(agent.replace('agent-',''), 10);
+  return 'k' + (((n-1)%3) + 1);
+}
+
+let lastFindingsCount = 0;
+let flashTimer = null;
+
+function render(state){
+  noteFindings(state.findings);
+  const now = Math.floor(Date.now()/1000);
+
+  // tick
+  $('#tick').textContent = state.findings.length;
+
+  // roster cards — hide any agent inactive for >5 min (kicked out)
+  for(const slot of ['agent-1','agent-2','agent-3']){
+    const card = document.querySelector(`.ks[data-slot="${slot}"]`);
+    if(!card) continue;
+    const entry = state.roster.find(r => r.name === slot);
+    const writes = state.findings.filter(f => f.agent === slot);
+    const last = writes.length ? writes[writes.length-1] : null;
+    const lastObserved = agentLastSeen(slot);
+    const agoObserved = lastObserved ? (now - lastObserved) : Infinity;
+
+    // kick out only after observed activity has gone stale (>5 min).
+    // Pre-arrival slots stay visible as faint placeholders so you see who's coming.
+    const shouldHide = lastObserved && agoObserved > KICK_AGENT_SECS;
+    card.style.display = shouldHide ? 'none' : '';
+
+    if(entry){
+      card.classList.remove('unregistered');
+      card.querySelector('[data-joined]').textContent = 'joined ' + entry.joined.replace(/.*T/,'').replace('Z','');
+    }
+    card.querySelector('[data-writes]').textContent = writes.length;
+    card.querySelector('[data-last]').textContent = last ? last.section : '—';
+
+    // online vs idle: fresh observed write
+    if(lastObserved){
+      card.classList.toggle('online', agoObserved < 30);
+      card.classList.toggle('idle', agoObserved > 90);
+    }
+  }
+
+  // section partitions
+  const counts = {Transport:0, Lodging:0, Activities:0, Budget:0};
+  const agentsBySection = {Transport:new Set(), Lodging:new Set(), Activities:new Set(), Budget:new Set()};
+  for(const f of state.findings){
+    if(counts[f.section] !== undefined){
+      counts[f.section]++;
+      agentsBySection[f.section].add(f.agent);
+    }
+  }
+
+  for(const sec of SECTIONS){
+    const part = document.querySelector(`.partition[data-part="${sec}"]`);
+    if(!part) continue;
+    part.querySelector('[data-count]').textContent = counts[sec];
+    part.classList.toggle('dup', agentsBySection[sec].size >= 2);
+
+    const entriesEl = part.querySelector('[data-entries]');
+    const items = state.findings.filter(f => f.section === sec);
+    if(items.length === 0){
+      entriesEl.innerHTML = '<div class="empty">— awaiting findings —</div>';
+    } else {
+      entriesEl.innerHTML = '';
+      // newest first, max 3 per partition (each is now ~3 lines tall)
+      items.slice().reverse().slice(0,3).forEach((f) => {
+        const e = document.createElement('div');
+        e.className = `entry ${agentClass(f.agent)}`;
+        const tickLabel = 't' + pad(state.findings.indexOf(f)+1);
+        e.innerHTML = `
+          <span class="e-tick">${tickLabel}</span>
+          <span class="e-text">${f.headline}</span>
+          <span class="e-by">${f.agent}</span>
+        `;
+        entriesEl.appendChild(e);
+      });
+    }
+  }
+
+  // flash on new finding
+  if(state.findings.length > lastFindingsCount){
+    const newest = state.findings[state.findings.length-1];
+    const part = document.querySelector(`.partition[data-part="${newest.section}"]`);
+    if(part){
+      part.classList.add('flash');
+      clearTimeout(flashTimer);
+      flashTimer = setTimeout(() => part.classList.remove('flash'), 1400);
+    }
+  }
+  lastFindingsCount = state.findings.length;
+
+  // last write — use file mtime (honest), fall back to observed-finding epoch
+  const last = state.findings.length ? state.findings[state.findings.length-1] : null;
+  const lastEpoch = lastFileMtime || (last ? agentLastSeen(last.agent) : 0);
+  const agoFile = lastEpoch ? (now - lastEpoch) : null;
+  if(last){
+    $('#last-write').innerHTML = `<em>${last.agent}</em> · ${last.section}`;
+    $('#last-body').innerHTML = (agoFile !== null ? `<b>${agoFile}s</b> ago · ` : '') + last.headline.slice(0,60) + '…';
+  } else {
+    $('#last-write').innerHTML = `<em>—</em> idle`;
+    $('#last-body').innerHTML = `Watching <code>blackboard.md</code> · refresh 1s`;
+  }
+  if(agoFile !== null){
+    $('#warn-stale').classList.toggle('on', agoFile > STALE_SECS);
+    $('#stale-secs').textContent = agoFile;
+  } else {
+    $('#warn-stale').classList.remove('on');
+  }
+
+  // roster cell
+  $('#roster-count').textContent = state.roster.length;
+  if(state.roster.length === 0){
+    $('#roster-body').textContent = 'No agents have registered yet.';
+  } else {
+    $('#roster-body').innerHTML = state.roster.map(r => `<b>${r.name}</b>`).join(' · ');
+  }
+
+  // coverage cell
+  const coveredSections = SECTIONS.filter(s => counts[s] >= 2).length;
+  $('#coverage-v').innerHTML = `<em>${coveredSections}</em> / 4 sections`;
+  const thinSections = SECTIONS.filter(s => counts[s] < 2);
+  $('#coverage-body').textContent = thinSections.length === 0
+    ? 'All sections covered. Synthesis can proceed.'
+    : 'Thin: ' + thinSections.join(', ');
+
+  // synthesis
+  const synthCard = $('#synth-card');
+  if(state.synthAgent){
+    synthCard.classList.remove('unregistered');
+    synthCard.classList.add('online');
+    $('#synth-status').textContent = `by ${state.synthAgent}`;
+    $('#warn-synth').classList.add('on');
+  } else {
+    synthCard.classList.add('unregistered');
+    synthCard.classList.remove('online');
+    $('#synth-status').textContent = 'pending';
+    $('#warn-synth').classList.remove('on');
+  }
+}
+
+async function poll(){
+  try{
+    const r = await fetch(BOARD_URL + '?_=' + Date.now(), {cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const md = await r.text();
+    const state = parseBoard(md);
+    render(state);
+    const lm = r.headers.get('last-modified');
+    if(lm){
+      const d = new Date(lm);
+      if(!isNaN(d.getTime())) lastFileMtime = Math.floor(d.getTime()/1000);
+      $('#last-mtime').textContent = lm.split(',')[1]?.trim().slice(0,17) || lm;
+    } else {
+      $('#last-mtime').textContent = new Date().toLocaleTimeString();
+    }
+    $('#conn-status').textContent = 'live · ' + new Date().toLocaleTimeString();
+  } catch(e){
+    $('#conn-status').textContent = 'offline · ' + e.message;
+  }
+}
+
+poll();
+setInterval(poll, POLL_MS);
+</script>
+</body>
+</html>

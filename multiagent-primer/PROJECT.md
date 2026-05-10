@@ -1,39 +1,7 @@
-# Multi-Agent Primer Labs — Project Vision
+# Multi-Agent Primer — Design Doc
 
-> **For future Claude sessions started in this directory after it has been moved.**
-> This file gives you the full context. Read it before doing any work in this folder.
-
----
-
-## What this folder is
-
-A sequence of **three small hands-on labs** that teach the *primitives* of multi-agent systems before students attempt anything ambitious. Each lab runs **on a single student's laptop** using **multiple Claude Code instances** as the agents. No servers, no frameworks, no networking infrastructure — just shared markdown files and 2–3 terminal tabs.
-
-The labs are a **primer for a much larger 5-team coding exercise** (the "blackboard-classroom" project, separate folder, separate Claude session). Students will not survive the big exercise without this primer. The primer earns them the right to attempt it.
-
----
-
-## Where this fits in the course
-
-This is part of **Modern AI Pro's "Multi-Agent Systems v2" path**, lessons in `class-platform/app/paths/multiagents-v2/_lessons/`:
-
-```
-1.  what-is-an-agent
-2.  agent-anatomy            (R/A/O loop)
-3.  why-multi-agent
-4.  agentic-rag
-5.  coordination-crisis      ← Lab 1 lands this
-6.  16-pillar-framework      ← see "The 16 Pillars" below
-7.  model-inflection
-8.  shared-state             ← Lab 1's PRIMARY target
-9.  team-design              ← Lab 3's PRIMARY target
-10. architecture-workshop    ← the BIG exercise (other folder)
-11. architecture-frontier
-12. task-allocation          ← Lab 2's PRIMARY target
-13. hitl-design
-```
-
-The primer labs cover lessons **5, 8, 9, 12** in microcosm. The big exercise extends to **2, 9, 10, 12, 13**.
+> **For future Claude sessions and human contributors.**
+> This file holds the *why* — pedagogical thesis, the 16-pillar mapping, anti-patterns to avoid, and what to build next. For the *what* (folder list, time budget, prereqs, where students start), read [`README.md`](./README.md) first.
 
 ---
 
@@ -47,7 +15,7 @@ Our counter-bet: have students **feel** the primitives — staleness, races, dup
 
 ### Note on frameworks (revised 2026-05-09)
 
-The original directive was **no framework code in the labs.** That has been narrowed: it now applies specifically to **multi-agent coordination frameworks** (LangGraph, CrewAI, AutoGen) — anything that hides the primitives Labs 1-3 are designed to make students feel.
+The original directive was **no framework code in the labs.** That has been narrowed: it now applies specifically to **multi-agent coordination frameworks** (LangGraph, CrewAI, AutoGen) — anything that hides the primitives Labs 1–3 are designed to make students feel.
 
 **Single-agent workflow toolkits are allowed**, and Lab 0 uses one (gstack). Reasoning: a single-agent workflow library is not a multi-agent coordination framework — it has no shared state, no task allocation, no topology. It packages role-prompts and a sprint rhythm for one agent. Showing students this *first* establishes the baseline ("one agent + good roles ships real work") that makes Lab 1's coordination crisis land. Without it, students who already use Cursor/Claude Code daily will dismiss Lab 1 as a contrived problem.
 
@@ -55,51 +23,27 @@ A LangGraph comparison remains a take-home bonus *after* the labs — that one i
 
 ---
 
-## The labs
+## Where this fits in the course
 
-### Lab 0 — `lab0-workflow/` ✅ BUILT (bridge to gstack)
-- **Time:** 45 min (10 setup · 30 work · 5 reflect)
-- **Topology:** 1 agent, structured workflow
-- **Apparatus:** [`gstack`](./multiagent-primer/lab0-workflow/gstack/) — single-agent slash-command toolkit (Plan → Review → Build → Ship → Retro), bundled inside the lab folder
-- **Task:** run one tiny feature/fix end-to-end through the gstack sprint loop on a small sandbox repo
-- **Lesson it sets up:** §2 Agent Anatomy and the inversion that lands in Lab 1 — students feel the *single-agent ceiling* before they meet the *coordination problem*
-- **Pain it teaches:** none directly — the absence of pain is the point. This lab makes Lab 1's pain legible.
+This is part of **Modern AI Pro's "Multi-Agent Systems v2" path** (`class-platform/app/paths/multiagents-v2/_lessons/`):
 
-### Lab 1 — `lab1-blackboard/` ✅ BUILT
-- **Time:** 25 min (5 setup · 15 work · 5 reflect)
-- **Topology:** 3 peer agents, no roles, free-for-all
-- **Apparatus:** one shared `blackboard.md`; `bb-watch.sh` for live mirror
-- **Task:** research Stanford's *Smallville* generative-agents paper, produce a 400-word brief
-- **Lesson it lands:** §8 Shared State (and lays the groundwork for §5 Coordination Crisis to land naturally)
-- **Pain it teaches:** duplication, staleness, synthesis bottleneck, race conditions on writes
-- **Status:** complete and smoke-tested
+```
+1.  what-is-an-agent
+2.  agent-anatomy            (R/A/O loop)        ← Lab 0 sets up
+3.  why-multi-agent
+4.  agentic-rag
+5.  coordination-crisis      ← Lab 1 lands this
+6.  16-pillar-framework      ← see below
+7.  model-inflection
+8.  shared-state             ← Lab 1's PRIMARY target
+9.  team-design              ← Lab 3's PRIMARY target
+10. architecture-workshop    ← the BIG exercise (separate folder)
+11. architecture-frontier
+12. task-allocation          ← Lab 2's PRIMARY target
+13. hitl-design              ← Lab 4's PRIMARY target (optional)
+```
 
-### Lab 2 — `lab2-task-allocation/` ⏳ NOT YET BUILT
-- **Time:** 30 min
-- **Builds on:** Lab 1 (assumes student has felt the free-for-all pain)
-- **New apparatus:** tiny `task-cli` (~60 LOC Node) so claims are atomic — file-edit races on a tasks list would mask the contract-net lesson
-- **Topologies to compare:** free-for-all (broken), first-claim, contract-net (capability-based)
-- **Lesson it lands:** §12 Task Allocation
-- **Pain it teaches:** cherry-picking, capability mismatches, claim races
-- **Scaffolding plan:** `CLAUDE.md` + `task-cli/` (with `task list`, `task claim`, `task done`, `task add`)
-
-### Lab 3 — `lab3-team-design/` ⏳ NOT YET BUILT
-- **Time:** 35 min
-- **Builds on:** Labs 1 + 2 (assumes shared state and task allocation are now intuitive)
-- **Three short rounds, one variable:** supervisor / pipeline / swarm — same task, watch what changes
-- **Apparatus:** 3 variant `CLAUDE.md` files (one per topology), no new code
-- **Lesson it lands:** §9 Team Design
-- **Pain it teaches:** topology-task mismatch, supervisor as bottleneck, pipeline as serial death, swarm as drift
-
-### Lab 4 — `lab4-openclaw-optional/` ✅ BUILT (optional)
-- **Time:** 45 min
-- **Status:** optional — skip if the room is short on time or students don't all have Telegram accounts
-- **Builds on:** Lab 3 (assumes the student has now coordinated agents in shared state)
-- **New apparatus:** [openclaw](./multiagent-primer/lab4-openclaw-optional/openclaw/) — a self-hosted agent gateway connecting a Claude/Groq agent to a Telegram bot
-- **Lesson it lands:** §10 HITL — agents in production talk to *humans on real channels*, not just to each other in a tmux pane
-- **Pain it teaches:** API key management, channel auth, rate limits, the gap between "demo on a laptop" and "deployed on a number a customer can DM"
-
-After Lab 4 (or after Lab 3 if you skip 4), a **bonus take-home** (`bonus-langgraph/`) shows the same Smallville task in ~60 lines of LangGraph. The student's reaction should be *"oh — the framework is just packaging the patterns we invented."* That's the perfect inversion.
+The primer covers lessons **2, 5, 8, 9, 10, 12** in microcosm. The big exercise extends to **2, 9, 10, 12, 13**.
 
 ---
 
@@ -126,9 +70,9 @@ This framework is the spine of the course. Every lab and every design choice in 
 | 15 | **Evaluation · output vs coordination** | Three-level eval: each agent's diff, the combined output, the coordination behaviour. The first two pass while the third silently fails — that is the failure mode this course exists to fix. |
 | 16 | **Frameworks · the right tool** | LangGraph for routing/shared state. CrewAI for delegation. AutoGen for multi-agent dialogue. ADK for managed deployment. Demo-driven development is how you end up rewriting six months in. |
 
-### Maturity ladder (from the same lesson)
+### Maturity ladder
 
-- **≤8 covered** → notebook demo. Coordination layer not yet built. (Day 2 of the course is the construction project.)
+- **≤8 covered** → notebook demo. Coordination layer not yet built.
 - **9–12 covered** → in production, with outages clustering around the missing pillars.
 - **13–15 covered** → mature. Remaining gaps are usually the unglamorous ones (simulation, governance, learning) — also the ones that cost most when they fail.
 - **All 16** → either lying to yourself, or built something teachable. If the latter, write it up.
@@ -144,30 +88,34 @@ This framework is the spine of the course. Every lab and every design choice in 
 | Lab 4 — openclaw *(optional)* | 10 | 5 (channel = real intent), 13 (governance for a public bot) |
 | Big exercise (other folder) | 1, 2, 3, 8, 10, 13, 15 | 9, 14 |
 
-After all three labs + big exercise, students have **personally implemented** ~7 of 16 pillars and **felt the absence** of another ~6. That is enough fluency to read framework docs critically.
+After all labs + big exercise, students have **personally implemented ~7 of 16 pillars** and **felt the absence** of another ~6. Enough fluency to read framework docs critically.
 
 ---
 
-## Scaffolding policy (the user's directive)
+## Scaffolding policy
 
-- **Some labs get only `CLAUDE.md`** — pure prompt engineering, no code. The agent's behaviour is the lesson. → Labs 1 and 3.
-- **Some labs get `CLAUDE.md` + small code helpers** — when raw markdown editing would race so badly it masks the lesson. → Lab 2 (atomic task claims need a CLI).
-- **No frameworks anywhere in the primer.** LangGraph appears only as a take-home comparison after Lab 3.
-- **No web UI.** The web UI lives in the big classroom-server exercise (separate folder). Here, the file *is* the UI; `bb-watch.sh` is sugar.
+- **Pure prompt engineering** (CLAUDE.md only, no code) — when the agent's behaviour *is* the lesson. → Labs 1 and 3.
+- **CLAUDE.md + small code helpers** — when raw markdown editing would race so badly it masks the lesson. → Lab 2 (`task-cli` for atomic claims).
+- **Bundled third-party toolkit** — when a single-agent workflow toolkit is needed to set up the inversion. → Lab 0 (gstack).
+- **Bundled service** — when the lesson requires a real channel. → Lab 4 (openclaw).
+- **No web UI in the primer.** The web UI lives in the big classroom-server exercise (separate folder). Here, the file *is* the UI; `bb-watch.sh` is sugar.
 
 ---
 
-## Status snapshot (date this when updating)
+## Status snapshot (date when updating)
 
 | Component | State |
 |---|---|
-| `lab0-workflow/` | ✅ Built 2026-05-09. Bundles `gstack/` toolkit + `SDRAuto/` sandbox. |
-| `lab1-blackboard/` | ✅ Built and smoke-tested 2026-05-09 |
-| `lab2-task-allocation/` | ⏳ Designed, not built. Needs `CLAUDE.md` + `task-cli/` (~60 LOC Node) |
-| `lab3-team-design/` | ⏳ Designed, not built. Three `CLAUDE.md` variants for three topologies |
-| `lab4-openclaw-optional/` | ✅ Built 2026-05-09. Lab-level wrapper README + bundled `openclaw/` agent gateway. |
-| `bonus-langgraph/` | ⏳ Designed, not built. Same Smallville task in ~60 LOC of LangGraph |
-| `PROJECT.md` (this file) | ✅ |
+| `lab0-workflow/` | ✅ Built. Bundles `gstack/` toolkit + `SDRAuto/` and `docvault-legacy/` sandboxes. |
+| `lab1-blackboard/` | ✅ Built and smoke-tested. |
+| `lab2-task-allocation/` | ✅ Built. CLAUDE.md + `task-cli/` (Node) + 3 rounds (free-for-all → first-claim → contract-net). |
+| `lab3-team-design/` | 🟡 Partial. `round1-supervisor/CLAUDE.md` present; `round2-pipeline/`, `round3-swarm/` scaffolds in progress. |
+| `lab4-openclaw-optional/` | ✅ Built. Wrapper README + bundled `openclaw/` agent gateway. |
+| `bonus-langgraph/` | ⏳ Designed, not built. Same Smallville task in ~60 LOC of LangGraph. |
+| `README.md` (student entry point) | ✅ |
+| `PROJECT.md` (this file — design doc) | ✅ |
+
+Last updated: 2026-05-09.
 
 ---
 
@@ -175,38 +123,40 @@ After all three labs + big exercise, students have **personally implemented** ~7
 
 - **Class size:** ~50 students live, ~35 actively coding
 - **Format:** in-person classroom, projected leaderboard during the big exercise
-- **Tooling on every laptop:** Claude Code installed, an Anthropic Pro/Max subscription or API key, terminal with bash + awk + grep + sed (default on macOS/Linux/WSL)
-- **Network:** outbound HTTPS to `api.anthropic.com` is sufficient for the primer labs. (The big exercise also needs outbound to the kapi-prod blackboard server.)
-- **Total class block this primer occupies:** ~90 min (Lab 1: 25 · Lab 2: 30 · Lab 3: 35), then a 15-min debrief, then transition into the big exercise.
+- **Tooling on every laptop:** Claude Code installed, an Anthropic Pro/Max subscription or API key, terminal with `bash + awk + grep + sed + tmux` (default on macOS/Linux/WSL), Node 18+, Bun v1.0+
+- **Network:** outbound HTTPS to `api.anthropic.com` is sufficient for Labs 0–3. Lab 4 also needs Groq + Telegram. The big exercise also needs outbound to the kapi-prod blackboard server.
+- **Total class block this primer occupies:** ~135 min for Labs 0–3 (or ~180 min including Lab 4), then a 15-min debrief, then transition into the big exercise.
 
 ---
 
 ## What future Claude should NOT do
 
-1. **Do not introduce a framework into the labs.** The whole pedagogical bet is "primitives over frameworks." If a future Claude sees Lab 2 missing and thinks "I'll just use CrewAI" — read this file again, then don't.
-2. **Do not collapse the three labs into one.** The progression is the lesson. Lab 1 → "this is chaos, we need tasks" → Lab 2 → "this is biased, we need topology" → Lab 3.
+1. **Do not introduce a multi-agent coordination framework into the labs.** The pedagogical bet is "primitives over frameworks." Single-agent workflow toolkits (gstack-class) are fine in Lab 0; LangGraph/CrewAI/AutoGen are not.
+2. **Do not collapse the labs into one.** The progression is the lesson. Lab 0 → "one agent ships fine" → Lab 1 → "now three at once is chaos" → Lab 2 → "tasks fix the chaos" → Lab 3 → "topology shapes the outcome."
 3. **Do not add a web UI inside the primer.** That's the big exercise's job. The terminal + markdown + `bb-watch.sh` is the right surface area.
-4. **Do not edit `lab1-blackboard/blackboard.md`** to add example findings. It must stay an empty template — students are supposed to populate it.
+4. **Do not edit `lab1-blackboard/blackboard.md`** to add example findings. It must stay an empty template — students populate it.
 5. **Do not touch `class-platform/`** when working on the primer. Different concern, different deploy lifecycle.
+6. **Do not duplicate README content into PROJECT.md.** README = action-oriented student entry point. PROJECT.md = design rationale and future-contributor guide. Keep them complementary.
 
 ---
 
 ## What future Claude SHOULD do, if asked to continue building
 
-1. **Build Lab 2 next.** See the design block above. The atomic-claim CLI is the load-bearing piece — without it, claim races dominate the lesson.
-2. **Then Lab 3.** Three `CLAUDE.md` variants (`coordinator/`, `pipeline/`, `swarm/`), each a small directory the student `cd`s into. Same `task.md` across all three.
-3. **Then the LangGraph bonus.** ~60 LOC, runnable in Python, side-by-side comparison.
-4. **Update the Status snapshot above** every time you build a lab.
+1. **Finish Lab 3 round2 + round3 CLAUDE.md variants.** Round 2 (pipeline) and Round 3 (swarm). Same `task.md`, three `round*-*/CLAUDE.md` variants — that's the entire scaffold. No new code.
+2. **Build the LangGraph bonus.** ~60 LOC, runnable in Python, side-by-side with Lab 1's Smallville task. The student's reaction should be *"oh — the framework is just packaging the patterns we invented."* That's the perfect inversion.
+3. **Update the Status snapshot** above every time you build or change a lab.
+4. **Update README.md's lab table** if you add or remove a lab. The two docs reference the same labs — keep them in sync.
 5. **Re-test `bb-watch.sh`** if you change the blackboard template — the script's grep patterns are coupled to the template's section names.
 
 ---
 
-## Anchor docs (paths assume no folder move)
+## Anchor docs (paths from this folder)
 
-- This file: `/Users/bv/Code/active/modernaipro/multiagent-primer/PROJECT.md`
-- Big exercise (separate Claude session): `/Users/bv/Code/active/modernaipro/blackboard-classroom/`
-- Course lesson source: `/Users/bv/Code/active/modernaipro/class-platform/app/paths/multiagents-v2/_lessons/`
+- This file: `./PROJECT.md`
+- Student entry point: `./README.md`
+- Big exercise (separate Claude session, separate concern): `../blackboard-classroom/`
+- Workshop-kit (the student plugin for the big exercise — being moved to its own GitHub repo at `Kapi-IDE/workshop-kit`): `../workshop-kit/`
+- Course lesson source (when present): `../../class-platform/app/paths/multiagents-v2/_lessons/`
 - The 16 Pillars lesson source: `class-platform/app/paths/multiagents-v2/_lessons/sixteen-pillar-framework.tsx`
-- Project root CLAUDE.md (covers Kapi portfolio context): `/Users/bv/Code/active/CLAUDE.md`
 
-If the folder has been moved: the lesson sources may no longer be at those paths. The 16 pillars are reproduced in this file verbatim — work from this file, not the lesson source.
+If the folder has been moved or the lesson sources aren't present: the 16 pillars are reproduced in this file verbatim — work from this file, not the lesson source.

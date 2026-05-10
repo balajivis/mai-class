@@ -91,6 +91,9 @@ tmux split-window -v -t lab2:0.0 'claude --model haiku'
 tmux split-window -v -t lab2:0.2 'claude --model haiku'
 tmux select-layout -t lab2:0 tiled
 
+# window 1 — web mirror (auto-opens browser to localhost:8766)
+tmux new-window -t lab2 -n mirror './bb-serve.sh'
+
 # auto-kickoff after claude warmup, staggered
 (
   sleep 8

@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lab 2 — Task Allocation · Live Mirror</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Inter+Tight:wght@300;400;450;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0B0B0C; --ink-2:#1C1C1E; --ink-3:#3A3A3C;
+  --line:#D8D6D0; --line-soft:#E6E4DD;
+  --paper:#F4F2EC; --paper-2:#ECEAE3; --paper-card:#FBFAF6;
+  --muted:#6B6B6B; --muted-2:#8A8A86;
+  --accent:#8B2E1F; --accent-2:#B8674F; --accent-soft:#C58A75;
+  --teal:#2F5D62; --gold:#B08A3E; --olive:#5C6F3A;
+  --warn:#B8861F;
+  --serif:'Newsreader', 'Times New Roman', Georgia, serif;
+  --sans:'Inter Tight', ui-sans-serif, system-ui, -apple-system, Helvetica, Arial, sans-serif;
+  --mono:'JetBrains Mono', ui-monospace, Menlo, monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:#2a2722;color:var(--ink);
+  font-family:var(--serif);
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:"ss01","onum","liga";
+  min-height:100vh;display:grid;place-items:center;padding:24px 16px;
+}
+em{font-style:italic;color:var(--accent)}
+h1,h2,h3,h4,h5,h6{margin:0;font-family:var(--serif);font-weight:500;letter-spacing:-0.012em;line-height:1.05}
+p{margin:0}
+
+.frame{
+  width:1400px;max-width:100%;
+  background:var(--paper);color:var(--ink);
+  display:flex;flex-direction:column;
+  box-shadow:0 30px 80px rgba(0,0,0,0.45);
+}
+.runhead,.runfoot{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:14px 64px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:0.22em;
+  text-transform:uppercase;color:var(--muted);
+}
+.runhead{border-bottom:1px solid var(--line)}
+.runfoot{border-top:1px solid var(--line)}
+.rh-mark{font-family:var(--serif);font-style:italic;font-weight:500;font-size:14px;letter-spacing:0;text-transform:none;color:var(--ink)}
+.rh-mark .amp{color:var(--accent)}
+
+.head{
+  display:grid;grid-template-columns:130px 1fr auto;
+  gap:36px;align-items:end;
+  padding:28px 64px 22px;border-bottom:2px solid var(--ink);
+}
+.head .num-lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.22em;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:6px}
+.head .num{font-family:var(--serif);font-style:italic;font-size:96px;font-weight:400;color:var(--accent);letter-spacing:-0.04em;line-height:0.88}
+.head h1{font-family:var(--serif);font-size:60px;font-weight:400;letter-spacing:-0.022em;line-height:0.95}
+.head .sub{font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink-2);line-height:1.4;margin-top:12px;max-width:62ch;text-wrap:pretty}
+.head .meta{
+  text-align:right;font-family:var(--mono);font-size:10.5px;letter-spacing:0.22em;
+  color:var(--muted);text-transform:uppercase;line-height:1.7;white-space:nowrap;
+}
+.head .meta strong{display:block;font-family:var(--serif);font-style:italic;font-weight:400;font-size:24px;color:var(--ink);letter-spacing:-0.01em;text-transform:none;margin-bottom:4px}
+
+.legend{
+  display:flex;align-items:center;gap:28px;
+  padding:14px 64px;border-bottom:1px solid var(--line);
+  font-family:var(--mono);font-size:10.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);
+  background:var(--paper-2);flex-wrap:wrap;
+}
+.legend .item{display:flex;align-items:center;gap:8px}
+.legend .swatch{width:10px;height:10px;border-radius:50%}
+.legend .swatch.open{background:var(--teal)}
+.legend .swatch.claimed{background:var(--gold)}
+.legend .swatch.done{background:var(--olive)}
+.legend .swatch.orphan{background:var(--warn)}
+.legend .controls{margin-left:auto;display:flex;gap:14px;align-items:center}
+.legend .tick-meter{
+  font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink);
+  text-transform:none;letter-spacing:-0.005em;
+  display:flex;align-items:baseline;gap:8px;
+}
+.legend .tick-meter b{color:var(--accent);font-weight:400}
+.legend .tick-meter span{font-family:var(--mono);font-size:9.5px;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase}
+
+.stage{
+  display:grid;grid-template-columns:240px 1fr 240px;gap:0;
+  padding:28px 64px 14px;position:relative;min-height:580px;
+}
+.col-side{display:flex;flex-direction:column;gap:10px;padding-top:34px}
+.col-side .col-head{
+  font-family:var(--mono);font-size:10px;letter-spacing:0.22em;color:var(--muted);text-transform:uppercase;
+  padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:6px;
+}
+.col-side .col-head em{color:var(--accent);font-style:italic;font-family:var(--serif);text-transform:none;letter-spacing:0;font-size:13px}
+
+/* agent card */
+.ks{
+  background:var(--paper-card);border:1px solid var(--line);
+  padding:12px 12px 11px;position:relative;
+  transition:all .25s cubic-bezier(.2,.7,.2,1);
+}
+.ks .ks-row{display:flex;align-items:center;gap:10px}
+.ks .ks-icon{
+  width:32px;height:32px;border-radius:50%;
+  display:grid;place-items:center;
+  font-family:var(--serif);font-style:italic;font-size:15px;
+  color:var(--paper);background:var(--ink);flex-shrink:0;
+}
+.ks.k1 .ks-icon{background:var(--teal)}
+.ks.k2 .ks-icon{background:var(--accent)}
+.ks.k3 .ks-icon{background:var(--gold)}
+.ks .ks-name{font-family:var(--serif);font-style:italic;font-size:17px;color:var(--ink);font-weight:500;line-height:1.05}
+.ks .ks-tag{display:block;font-family:var(--mono);font-size:9px;letter-spacing:0.18em;color:var(--muted);text-transform:uppercase;margin-top:3px}
+.ks .ks-caps{
+  margin-top:9px;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:0.10em;
+  color:var(--accent);text-transform:none;line-height:1.5;
+}
+.ks .ks-stats{
+  display:flex;gap:12px;margin-top:10px;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:0.14em;color:var(--muted);text-transform:uppercase;
+}
+.ks .ks-stats .stat{display:inline-flex;align-items:center;gap:5px}
+.ks .ks-stats b{color:var(--ink);font-weight:500;font-family:var(--serif);font-size:14px;letter-spacing:0;text-transform:none;font-style:italic}
+.ks .ks-status{position:absolute;top:10px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--line)}
+.ks.firing .ks-status{background:var(--accent);animation:pulse 1.2s ease-in-out infinite}
+.ks.online .ks-status{background:var(--olive)}
+.ks.unregistered{opacity:0.5;border-style:dashed}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(139,46,31,0.5)}
+  50%{box-shadow:0 0 0 6px rgba(139,46,31,0)}
+}
+
+/* tasks board */
+.bb-wrap{position:relative;padding:34px 22px 0;display:flex;flex-direction:column}
+.bb-title{
+  font-family:var(--mono);font-size:10px;letter-spacing:0.22em;color:var(--muted);text-transform:uppercase;
+  padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:14px;
+  display:flex;justify-content:space-between;align-items:baseline;
+}
+.bb-title em{color:var(--accent);font-style:italic;font-family:var(--serif);text-transform:none;letter-spacing:0;font-size:13px}
+.bb-title .right{font-family:var(--serif);font-style:italic;font-size:13px;color:var(--ink-2);text-transform:none;letter-spacing:0}
+
+.tasks{
+  background:#0E0F11;
+  background-image:
+    radial-gradient(ellipse at 20% 30%, rgba(255,255,255,0.04), transparent 60%),
+    radial-gradient(ellipse at 80% 70%, rgba(184,103,79,0.05), transparent 60%);
+  border:1px solid var(--ink);position:relative;flex:1;
+  padding:18px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;
+  color:#E8E5DD;overflow:hidden;
+}
+.tasks::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
+  background-size:24px 24px;pointer-events:none;
+}
+.bb-stripe{
+  position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--teal),var(--gold),var(--accent),var(--olive));
+  opacity:.5;
+}
+
+.task{
+  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.10);
+  padding:11px 13px 10px;position:relative;
+  display:flex;flex-direction:column;gap:6px;
+  transition:all .35s cubic-bezier(.2,.7,.2,1);
+}
+.task.open    {border-left:3px solid var(--teal);  background:rgba(47,93,98,0.08)}
+.task.claimed {border-left:3px solid var(--gold);  background:rgba(176,138,62,0.10)}
+.task.done    {border-left:3px solid var(--olive); background:rgba(92,111,58,0.10);opacity:0.78}
+.task.orphan  {border-left:3px solid var(--warn);  background:rgba(184,134,31,0.12);box-shadow:0 0 0 1px rgba(184,134,31,0.4)}
+
+.task .t-row1{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.task .t-id{font-family:var(--mono);font-size:10px;letter-spacing:0.18em;color:rgba(255,255,255,0.55);text-transform:uppercase}
+.task .t-status{font-family:var(--mono);font-size:9px;letter-spacing:0.22em;text-transform:uppercase}
+.task.open    .t-status{color:#7FB7BD}
+.task.claimed .t-status{color:#D9B968}
+.task.done    .t-status{color:#9DAD7A}
+.task.orphan  .t-status{color:var(--warn)}
+.task .t-title{
+  font-family:var(--serif);font-style:italic;font-size:14.5px;font-weight:400;
+  color:#F4F2EC;line-height:1.32;letter-spacing:-0.005em;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.task .t-row2{
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.55);
+}
+.task .t-needs{color:var(--accent-soft)}
+.task .t-by{color:#fff}
+.task.done .t-by::before{content:"✓ "}
+
+/* control strip */
+.control{
+  margin:0 64px;background:var(--paper-card);border:1px solid var(--line);border-top:2px solid var(--ink);
+  display:grid;grid-template-columns:1fr 1fr 1fr;align-items:stretch;
+}
+.control .ctrl-cell{
+  padding:18px 22px;border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:6px;
+}
+.control .ctrl-cell:last-child{border-right:0}
+.control .ctrl-cell .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:0.22em;color:var(--muted);text-transform:uppercase}
+.control .ctrl-cell .v{font-family:var(--serif);font-style:italic;font-size:24px;color:var(--ink);line-height:1.2}
+.control .ctrl-cell .v em{color:var(--accent)}
+.control .ctrl-cell .body{font-family:var(--sans);font-size:11.5px;line-height:1.5;color:var(--ink-2);margin-top:2px}
+
+.explain{
+  display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:32px;
+  padding:22px 64px 28px;border-top:1px solid var(--line);margin-top:14px;
+}
+.explain .lede{
+  font-family:var(--serif);font-size:18px;line-height:1.5;color:var(--ink);text-wrap:pretty;
+  font-weight:400;border-left:2px solid var(--accent);padding-left:18px;
+}
+.explain .lede em{font-style:italic;color:var(--accent)}
+.explain .lede strong{font-weight:500}
+.explain .col h6{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:0.22em;color:var(--muted);text-transform:uppercase;
+  padding-bottom:8px;margin-bottom:10px;border-bottom:1px solid var(--line);
+}
+.explain .col h6 em{color:var(--accent);font-style:italic;font-family:var(--serif);text-transform:none;letter-spacing:0;font-size:12px}
+.explain .col p{font-family:var(--sans);font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+.explain .col p + p{margin-top:8px}
+.explain .col code{font-family:var(--mono);font-size:11px;color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div class="frame">
+
+  <div class="runhead">
+    <span>Lab 02 · Multi-Agent Primer</span>
+    <span class="rh-mark">Modern AI <span class="amp">&amp;</span> Pro</span>
+    <span id="conn-status">— connecting —</span>
+  </div>
+
+  <div class="head">
+    <div>
+      <span class="num-lbl">§ Lab</span>
+      <span class="num">II.</span>
+    </div>
+    <div>
+      <h1>Task <em>allocation.</em></h1>
+      <p class="sub">Same eight tasks, three agents, three rounds — only the rule changes. Watch the rule shape the team. <em>The contract is the CLI.</em></p>
+    </div>
+    <div class="meta">
+      <strong id="round-label">Round —</strong>
+      <span id="brief-line">8-task sprint backlog</span>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="item"><span class="swatch open"></span><span>Open</span></div>
+    <div class="item"><span class="swatch claimed"></span><span>Claimed</span></div>
+    <div class="item"><span class="swatch done"></span><span>Done</span></div>
+    <div class="item"><span class="swatch orphan"></span><span>Orphan (R3)</span></div>
+    <div class="controls">
+      <span class="tick-meter">progress · <b id="done-count">0</b><span>/ <span id="total-count">8</span> done</span></span>
+    </div>
+  </div>
+
+  <div class="stage">
+
+    <aside class="col-side">
+      <div class="col-head">Agents <em>i.</em></div>
+      <div class="ks k1 unregistered" data-slot="agent-1">
+        <div class="ks-status"></div>
+        <div class="ks-row">
+          <div class="ks-icon">1</div>
+          <div><div class="ks-name">agent-1</div><span class="ks-tag" data-role>Engineer</span></div>
+        </div>
+        <div class="ks-caps" data-caps>/plan-eng-review · /review</div>
+        <div class="ks-stats">
+          <span class="stat">done <b data-done>0</b></span>
+          <span class="stat">claimed <b data-claimed>0</b></span>
+        </div>
+      </div>
+      <div class="ks k2 unregistered" data-slot="agent-2">
+        <div class="ks-status"></div>
+        <div class="ks-row">
+          <div class="ks-icon">2</div>
+          <div><div class="ks-name">agent-2</div><span class="ks-tag" data-role>QA · Debug</span></div>
+        </div>
+        <div class="ks-caps" data-caps>/qa · /investigate</div>
+        <div class="ks-stats">
+          <span class="stat">done <b data-done>0</b></span>
+          <span class="stat">claimed <b data-claimed>0</b></span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="bb-wrap">
+      <div class="bb-title">
+        <span>Tasks <em>— eight in the backlog</em></span>
+        <span class="right">tasks.json · live</span>
+      </div>
+      <div class="tasks" id="tasks">
+        <div class="bb-stripe"></div>
+      </div>
+    </div>
+
+    <aside class="col-side">
+      <div class="col-head">More <em>ii.</em></div>
+      <div class="ks k3 unregistered" data-slot="agent-3">
+        <div class="ks-status"></div>
+        <div class="ks-row">
+          <div class="ks-icon">3</div>
+          <div><div class="ks-name">agent-3</div><span class="ks-tag" data-role>Writer · Mgr</span></div>
+        </div>
+        <div class="ks-caps" data-caps>/document-release · /retro</div>
+        <div class="ks-stats">
+          <span class="stat">done <b data-done>0</b></span>
+          <span class="stat">claimed <b data-claimed>0</b></span>
+        </div>
+      </div>
+      <div class="ks">
+        <div class="ks-row">
+          <div class="ks-icon">★</div>
+          <div><div class="ks-name">Backlog</div><span class="ks-tag">Sprint</span></div>
+        </div>
+        <div class="ks-stats">
+          <span class="stat">open <b id="open-count">0</b></span>
+          <span class="stat">orphan <b id="orphan-count">0</b></span>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="control">
+    <div class="ctrl-cell">
+      <span class="lbl">Round</span>
+      <div class="v"><em id="round-num">—</em></div>
+      <div class="body" id="round-body">Detected from kickoff. Resets on every <code>./lab2-up.sh N</code>.</div>
+    </div>
+    <div class="ctrl-cell">
+      <span class="lbl">Distribution</span>
+      <div class="v" id="dist-v"><em>—</em></div>
+      <div class="body" id="dist-body">Watch for cherry-picking and orphans.</div>
+    </div>
+    <div class="ctrl-cell">
+      <span class="lbl">Last claim</span>
+      <div class="v" id="last-claim"><em>—</em></div>
+      <div class="body" id="last-body">Watching <code>tasks.json</code> · refresh 1s</div>
+    </div>
+  </div>
+
+  <div class="explain">
+    <p class="lede">
+      In Round 2 the CLI prevents <em>races</em> but not <em>fairness.</em> In Round 3, capabilities make allocation principled — and surface a new pain: <strong>orphan tasks</strong> nobody can do, and <strong>cheating</strong> when an agent claims outside its profile.
+    </p>
+    <div class="col">
+      <h6>What to <em>watch</em></h6>
+      <p>A <b>yellow-highlighted task</b> means it's been claimed but not done in &gt;5 min — possibly stuck. An <b>orphan</b> in Round 3 means no agent has the capability listed in <code>needs</code>.</p>
+      <p>Compare per-agent done counts. Big gaps = cherry-picking (R2) or imbalanced capabilities (R3).</p>
+    </div>
+    <div class="col">
+      <h6>The contract is the <em>CLI</em></h6>
+      <p>All claims go through <code>./task-cli/task</code> (POSIX <code>O_EXCL</code> lock). The CLI doesn't enforce capability match — that's discipline, and discipline is the lesson.</p>
+      <p>Cheating shows up as hollow output, not a CLI error.</p>
+    </div>
+  </div>
+
+  <div class="runfoot">
+    <span>Modern AI &amp; Pro · Lab 2</span>
+    <span>Pillar 2 · Task Allocation · Contract Net</span>
+    <span>Live mirror · polling 1s</span>
+  </div>
+
+</div>
+
+<script>
+const URL_TASKS = 'tasks.json';
+const POLL_MS = 1000;
+const STUCK_SECS = 300;
+
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const pad = n => String(n).padStart(2,'0');
+
+// fixed capability map matches lab2-up.sh kickoff
+const CAPS = {
+  'agent-1': ['/plan-eng-review','/review'],
+  'agent-2': ['/qa','/investigate'],
+  'agent-3': ['/document-release','/retro'],
+};
+
+let lastSeenClaim = null;
+let lastClaimEpoch = 0;
+
+function epochOf(iso){
+  if(!iso) return 0;
+  const d = new Date(iso); return isNaN(d.getTime()) ? 0 : Math.floor(d.getTime()/1000);
+}
+
+function detectRound(data){
+  // heuristic: if any task has been claimed and tasks.md exists alongside, round 1.
+  // we can't read sibling files from JS, so just say "live" — round shown in kickoff window.
+  return data.round || '—';
+}
+
+function isOrphan(t){
+  // R3 orphan = open task with needs nobody covers
+  if(t.status !== 'open') return false;
+  const needs = t.needs || [];
+  if(!needs.length) return false;
+  const allCaps = new Set([].concat(...Object.values(CAPS)));
+  return needs.some(n => !allCaps.has(n));
+}
+
+function render(data){
+  const now = Math.floor(Date.now()/1000);
+  const tasks = data.tasks || [];
+  const counts = { open:0, claimed:0, done:0, orphan:0 };
+  const byAgent = { 'agent-1':{done:0,claimed:0}, 'agent-2':{done:0,claimed:0}, 'agent-3':{done:0,claimed:0} };
+
+  for(const t of tasks){
+    counts[t.status]++;
+    if(isOrphan(t)) counts.orphan++;
+    if(t.claimed_by && byAgent[t.claimed_by]){
+      if(t.status === 'done') byAgent[t.claimed_by].done++;
+      else byAgent[t.claimed_by].claimed++;
+    }
+  }
+
+  $('#done-count').textContent = counts.done;
+  $('#total-count').textContent = tasks.length;
+  $('#open-count').textContent = counts.open;
+  $('#orphan-count').textContent = counts.orphan;
+
+  // task cards
+  const grid = $('#tasks');
+  // preserve stripe; clear rest
+  grid.querySelectorAll('.task').forEach(n => n.remove());
+  for(const t of tasks){
+    const orphan = isOrphan(t);
+    const stuckClaimed = t.status === 'claimed' && t.claimed_at && (now - epochOf(t.claimed_at) > STUCK_SECS);
+    const cls = orphan ? 'orphan' : (stuckClaimed ? 'orphan' : t.status);
+    const div = document.createElement('div');
+    div.className = `task ${cls}`;
+    const needs = (t.needs || []).join(' · ');
+    const by = t.claimed_by ? `${t.claimed_by}` : '—';
+    div.innerHTML = `
+      <div class="t-row1">
+        <span class="t-id">${t.id}</span>
+        <span class="t-status">${orphan ? 'ORPHAN' : (stuckClaimed ? 'STUCK' : t.status)}</span>
+      </div>
+      <div class="t-title">${t.title.replace(/</g,'&lt;')}</div>
+      <div class="t-row2">
+        <span class="t-needs">${needs}</span>
+        <span class="t-by">${by}</span>
+      </div>
+    `;
+    grid.appendChild(div);
+  }
+
+  // agent cards
+  for(const slot of ['agent-1','agent-2','agent-3']){
+    const card = document.querySelector(`.ks[data-slot="${slot}"]`);
+    if(!card) continue;
+    const stats = byAgent[slot];
+    const active = stats.done > 0 || stats.claimed > 0;
+    card.classList.toggle('unregistered', !active);
+    card.classList.toggle('online', stats.claimed > 0);
+    card.querySelector('[data-done]').textContent = stats.done;
+    card.querySelector('[data-claimed]').textContent = stats.claimed;
+  }
+
+  // distribution analysis
+  const totals = Object.entries(byAgent).map(([k,v]) => ({k, total:v.done + v.claimed}));
+  totals.sort((a,b) => b.total - a.total);
+  const max = totals[0].total, min = totals[2].total;
+  const distSummary = totals.map(x => `${x.k.replace('agent-','')}:${x.total}`).join('  ·  ');
+  $('#dist-v').innerHTML = `<em>${distSummary}</em>`;
+  if(max - min >= 3 && counts.done + counts.claimed >= 4){
+    $('#dist-body').innerHTML = `<b style="color:var(--accent)">cherry-pick:</b> ${totals[0].k} pulling ahead`;
+  } else if(counts.orphan > 0){
+    $('#dist-body').innerHTML = `<b style="color:var(--warn)">${counts.orphan} orphan${counts.orphan>1?'s':''}</b> · capability gap`;
+  } else {
+    $('#dist-body').textContent = 'Balanced — watch for orphans next';
+  }
+
+  // last claim
+  const claimed = tasks.filter(t => t.claimed_at).sort((a,b) => epochOf(b.claimed_at) - epochOf(a.claimed_at));
+  if(claimed.length){
+    const t = claimed[0];
+    $('#last-claim').innerHTML = `<em>${t.claimed_by}</em> · ${t.id}`;
+    const ago = now - epochOf(t.claimed_at);
+    $('#last-body').innerHTML = `<b>${ago}s</b> ago · ${t.title.slice(0,55)}…`;
+  }
+}
+
+async function poll(){
+  try{
+    const r = await fetch(URL_TASKS + '?_=' + Date.now(), {cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const data = await r.json();
+    render(data);
+    $('#conn-status').textContent = 'live · ' + new Date().toLocaleTimeString();
+  } catch(e){
+    $('#conn-status').textContent = 'offline · ' + e.message;
+  }
+}
+
+poll();
+setInterval(poll, POLL_MS);
+</script>
+</body>
+</html>
