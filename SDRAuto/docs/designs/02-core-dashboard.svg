@@ -1,0 +1,429 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" font-family="'Inter', 'SF Pro Display', -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f1a"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="sidebar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#12122a"/>
+      <stop offset="100%" style="stop-color:#16162e"/>
+    </linearGradient>
+    <linearGradient id="card2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e1e35"/>
+      <stop offset="100%" style="stop-color:#18182f"/>
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#10b981"/>
+      <stop offset="100%" style="stop-color:#34d399"/>
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#06b6d4"/>
+      <stop offset="100%" style="stop-color:#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="amberGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f59e0b"/>
+      <stop offset="100%" style="stop-color:#fbbf24"/>
+    </linearGradient>
+    <linearGradient id="roseGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f43f5e"/>
+      <stop offset="100%" style="stop-color:#fb7185"/>
+    </linearGradient>
+    <linearGradient id="chartLine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="50%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#a78bfa"/>
+    </linearGradient>
+    <filter id="glow2">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="shadow2">
+      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+    <clipPath id="chartClip"><rect x="248" y="258" width="570" height="140"/></clipPath>
+
+    <style>
+      @keyframes dash2 { to { stroke-dashoffset: -20; } }
+      @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes countUp { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes chartDraw { from { stroke-dashoffset: 800; } to { stroke-dashoffset: 0; } }
+      @keyframes barGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+      @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+      @keyframes slideIn { from { transform: translateX(-15px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+      @keyframes notifPulse { 0% { r: 6; } 50% { r: 8; } 100% { r: 6; } }
+      .draw-line { stroke-dasharray: 800; animation: chartDraw 2s ease-out 0.5s both; }
+      .bar-grow { transform-origin: bottom; animation: barGrow 1s ease-out both; }
+      .fade-up-1 { animation: fadeUp 0.5s ease-out 0.3s both; }
+      .fade-up-2 { animation: fadeUp 0.5s ease-out 0.5s both; }
+      .fade-up-3 { animation: fadeUp 0.5s ease-out 0.7s both; }
+      .fade-up-4 { animation: fadeUp 0.5s ease-out 0.9s both; }
+      .slide-1 { animation: slideIn 0.4s ease-out 1.2s both; }
+      .slide-2 { animation: slideIn 0.4s ease-out 1.4s both; }
+      .slide-3 { animation: slideIn 0.4s ease-out 1.6s both; }
+      .slide-4 { animation: slideIn 0.4s ease-out 1.8s both; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="900" fill="url(#bg2)"/>
+  <g opacity="0.02">
+    <pattern id="grid2" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#fff" stroke-width="0.5"/>
+    </pattern>
+    <rect width="1200" height="900" fill="url(#grid2)"/>
+  </g>
+
+  <!-- ===== SIDEBAR ===== -->
+  <rect x="0" y="0" width="220" height="900" fill="url(#sidebar)"/>
+  <line x1="220" y1="0" x2="220" y2="900" stroke="#2d2d4a" stroke-width="1"/>
+
+  <!-- Logo area -->
+  <rect x="20" y="20" width="180" height="50" rx="12" fill="#1a1a35"/>
+  <circle cx="48" cy="45" r="14" fill="url(#purpleGrad)" opacity="0.8"/>
+  <text x="48" y="50" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">A</text>
+  <text x="72" y="43" fill="#e2e8f0" font-size="14" font-weight="700">AutoBDR</text>
+  <text x="72" y="57" fill="#64748b" font-size="9">Autonomous Outbound</text>
+
+  <!-- Nav items -->
+  <g>
+    <!-- Active: Dashboard -->
+    <rect x="12" y="95" width="196" height="38" rx="8" fill="#6366f1" opacity="0.12"/>
+    <rect x="12" y="95" width="3" height="38" rx="1.5" fill="url(#purpleGrad)"/>
+    <text x="45" y="119" fill="#a78bfa" font-size="13" font-weight="600">Dashboard</text>
+    <!-- Campaigns -->
+    <text x="45" y="157" fill="#64748b" font-size="13">Campaigns</text>
+    <!-- Reply Queue with badge -->
+    <text x="45" y="195" fill="#64748b" font-size="13">Reply Queue</text>
+    <circle cx="155" cy="191" r="10" fill="#f43f5e" opacity="0.9">
+      <animate attributeName="r" values="9;11;9" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <text x="155" y="195" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">7</text>
+    <!-- Leads -->
+    <text x="45" y="233" fill="#64748b" font-size="13">Leads</text>
+    <!-- Voice Profile -->
+    <text x="45" y="271" fill="#64748b" font-size="13">Voice Profile</text>
+    <!-- Reasoning Log -->
+    <text x="45" y="309" fill="#64748b" font-size="13">Reasoning Log</text>
+    <!-- Settings -->
+    <text x="45" y="347" fill="#64748b" font-size="13">Settings</text>
+  </g>
+
+  <!-- Sidebar bottom: Autonomy Level -->
+  <rect x="20" y="800" width="180" height="80" rx="12" fill="#1a1a35" stroke="#2d2d4a" stroke-width="0.5"/>
+  <text x="35" y="825" fill="#64748b" font-size="9" font-weight="600" letter-spacing="0.5">AUTONOMY LEVEL</text>
+  <text x="35" y="848" fill="#a78bfa" font-size="18" font-weight="700">L2</text>
+  <text x="65" y="848" fill="#64748b" font-size="10">First touch approval</text>
+  <rect x="35" y="860" width="150" height="4" rx="2" fill="#1e1e35"/>
+  <rect x="35" y="860" width="75" height="4" rx="2" fill="url(#purpleGrad)"/>
+
+  <!-- ===== MAIN CONTENT ===== -->
+
+  <!-- Top bar -->
+  <rect x="220" y="0" width="980" height="60" fill="#12122a" opacity="0.5"/>
+  <line x1="220" y1="60" x2="1200" y2="60" stroke="#2d2d4a" stroke-width="0.5"/>
+  <text x="250" y="38" fill="#e2e8f0" font-size="18" font-weight="700">Dashboard</text>
+  <text x="400" y="38" fill="#64748b" font-size="12">Campaign: Q1 Outbound</text>
+  <!-- Status pill -->
+  <rect x="550" y="22" width="60" height="22" rx="11" fill="#10b981" opacity="0.15"/>
+  <circle cx="565" cy="33" r="3" fill="#10b981"><animate attributeName="opacity" values="1;0.4;1" dur="2s" repeatCount="indefinite"/></circle>
+  <text x="577" y="37" fill="#34d399" font-size="10" font-weight="600">Live</text>
+
+  <!-- ===== KPI CARDS (Row 1) ===== -->
+
+  <!-- KPI 1: Accounts -->
+  <g class="fade-up-1" filter="url(#shadow2)">
+    <rect x="240" y="80" width="215" height="105" rx="14" fill="url(#card2)" stroke="#2d2d4a" stroke-width="0.5"/>
+    <text x="260" y="105" fill="#64748b" font-size="10" font-weight="600" letter-spacing="0.5">My Pipeline</text>
+    <text x="260" y="145" fill="#e2e8f0" font-size="36" font-weight="700">247</text>
+    <text x="260" y="168" fill="#10b981" font-size="11">+32 this week</text>
+    <!-- Mini sparkline -->
+    <polyline points="370,155 385,148 400,150 415,140 430,135 445,130" fill="none" stroke="#6366f1" stroke-width="1.5" opacity="0.5"/>
+  </g>
+
+  <!-- KPI 2: Emails Sent -->
+  <g class="fade-up-2" filter="url(#shadow2)">
+    <rect x="470" y="80" width="215" height="105" rx="14" fill="url(#card2)" stroke="#2d2d4a" stroke-width="0.5"/>
+    <text x="490" y="105" fill="#64748b" font-size="10" font-weight="600" letter-spacing="0.5">FIRST TOUCHES SENT</text>
+    <text x="490" y="145" fill="#e2e8f0" font-size="36" font-weight="700">1,842</text>
+    <text x="490" y="168" fill="#10b981" font-size="11">+156 today</text>
+    <polyline points="600,155 615,150 630,145 645,142 660,138 675,130" fill="none" stroke="#06b6d4" stroke-width="1.5" opacity="0.5"/>
+  </g>
+
+  <!-- KPI 3: Reply Rate -->
+  <g class="fade-up-3" filter="url(#shadow2)">
+    <rect x="700" y="80" width="215" height="105" rx="14" fill="url(#card2)" stroke="#2d2d4a" stroke-width="0.5"/>
+    <text x="720" y="105" fill="#64748b" font-size="10" font-weight="600" letter-spacing="0.5">REPLY RATE</text>
+    <text x="720" y="145" fill="#e2e8f0" font-size="36" font-weight="700">18.4%</text>
+    <text x="720" y="168" fill="#10b981" font-size="11">+2.1% vs baseline</text>
+    <!-- Mini donut -->
+    <circle cx="870" cy="140" r="20" fill="none" stroke="#1e1e35" stroke-width="6"/>
+    <circle cx="870" cy="140" r="20" fill="none" stroke="url(#greenGrad)" stroke-width="6" stroke-dasharray="23 103" stroke-dashoffset="-26" stroke-linecap="round">
+      <animate attributeName="stroke-dasharray" from="0 126" to="23 103" dur="1.5s" begin="0.7s" fill="freeze"/>
+    </circle>
+  </g>
+
+  <!-- KPI 4: Meetings Booked -->
+  <g class="fade-up-4" filter="url(#shadow2)">
+    <rect x="930" y="80" width="215" height="105" rx="14" fill="url(#card2)" stroke="#2d2d4a" stroke-width="0.5"/>
+    <text x="950" y="105" fill="#64748b" font-size="10" font-weight="600" letter-spacing="0.5">MEETINGS BOOKED</text>
+    <text x="950" y="145" fill="#e2e8f0" font-size="36" font-weight="700">34</text>
+    <text x="950" y="168" fill="#fbbf24" font-size="11">6 this week</text>
+    <!-- Calendar mini icon -->
+    <rect x="1090" y="120" width="30" height="30" rx="4" fill="none" stroke="#f59e0b" stroke-width="1" opacity="0.5"/>
+    <line x1="1090" y1="128" x2="1120" y2="128" stroke="#f59e0b" stroke-width="1" opacity="0.5"/>
+    <text x="1105" y="144" text-anchor="middle" fill="#fbbf24" font-size="12" font-weight="700">6</text>
+  </g>
+
+  <!-- ===== CHART: Outreach Performance (Row 2 Left) ===== -->
+  <g filter="url(#shadow2)">
+    <rect x="240" y="200" width="580" height="210" rx="14" fill="url(#card2)" stroke="#2d2d4a" stroke-width="0.5"/>
+    <text x="260" y="230" fill="#e2e8f0" font-size="14" font-weight="600">Outreach Performance</text>
+    <text x="400" y="230" fill="#64748b" font-size="10">Last 30 days</text>
+    <!-- Legend -->
+    <circle cx="680" cy="226" r="4" fill="#6366f1"/>
+    <text x="690" y="230" fill="#94a3b8" font-size="9">Sent</text>
+    <circle cx="730" cy="226" r="4" fill="#10b981"/>
+    <text x="740" y="230" fill="#94a3b8" font-size="9">Replies</text>
+    <circle cx="790" cy="226" r="4" fill="#f59e0b"/>
+    <text x="800" y="230" fill="#94a3b8" font-size="9">Booked</text>
+
+    <!-- Y-axis labels -->
+    <text x="256" y="268" fill="#475569" font-size="8" text-anchor="end">80</text>
+    <text x="256" y="303" fill="#475569" font-size="8" text-anchor="end">60</text>
+    <text x="256" y="338" fill="#475569" font-size="8" text-anchor="end">40</text>
+    <text x="256" y="373" fill="#475569" font-size="8" text-anchor="end">20</text>
+    <text x="256" y="395" fill="#475569" font-size="8" text-anchor="end">0</text>
+
+    <!-- Grid lines -->
+    <g opacity="0.08">
+      <line x1="265" y1="265" x2="800" y2="265" stroke="#fff" stroke-width="0.5"/>
+      <line x1="265" y1="300" x2="800" y2="300" stroke="#fff" stroke-width="0.5"/>
+      <line x1="265" y1="335" x2="800" y2="335" stroke="#fff" stroke-width="0.5"/>
+      <line x1="265" y1="370" x2="800" y2="370" stroke="#fff" stroke-width="0.5"/>
+    </g>
+
+    <!-- Chart area -->
+    <g clip-path="url(#chartClip)">
+      <!-- Sent line (animated) -->
+      <polyline points="270,360 310,350 350,340 390,330 430,310 470,300 510,285 550,290 590,270 630,260 670,255 710,250 750,240 790,235"
+        fill="none" stroke="url(#chartLine)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="draw-line"/>
+      <!-- Area fill under sent line -->
+      <polygon points="270,360 310,350 350,340 390,330 430,310 470,300 510,285 550,290 590,270 630,260 670,255 710,250 750,240 790,235 790,395 270,395"
+        fill="#6366f1" opacity="0.06">
+        <animate attributeName="opacity" from="0" to="0.06" dur="2s" begin="0.5s" fill="freeze"/>
+      </polygon>
+
+      <!-- Replies line -->
+      <polyline points="270,390 310,385 350,382 390,378 430,372 470,368 510,362 550,365 590,355 630,350 670,348 710,345 750,340 790,337"
+        fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="draw-line" opacity="0.8"/>
+
+      <!-- Booked line -->
+      <polyline points="270,394 310,393 350,392 390,391 430,390 470,388 510,386 550,387 590,384 630,382 670,381 710,379 750,377 790,375"
+        fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="draw-line" opacity="0.7"/>
+    </g>
+
+    <!-- Active data point with tooltip -->
+    <g opacity="0">
+      <animate attributeName="opacity" from="0" to="1" dur="0.3s" begin="2.5s" fill="freeze"/>
+      <line x1="710" y1="250" x2="710" y2="395" stroke="#6366f1" stroke-width="0.5" stroke-dasharray="2 2" opacity="0.3"/>
+      <circle cx="710" cy="250" r="4" fill="#6366f1" stroke="#0f0f1a" stroke-width="2"/>
+      <circle cx="710" cy="345" r="3" fill="#10b981" stroke="#0f0f1a" stroke-width="2"/>
+      <circle cx="710" cy="379" r="3" fill="#f59e0b" stroke="#0f0f1a" stroke-width="2"/>
+      <!-- Tooltip -->
+      <rect x="720" y="238" width="80" height="48" rx="6" fill="#252545" stroke="#3d3d5c" stroke-width="0.5"/>
+      <text x="730" y="254" fill="#a78bfa" font-size="9">Sent: 72</text>
+      <text x="730" y="268" fill="#34d399" font-size="9">Replies: 14</text>
+      <text x="730" y="282" fill="#fbbf24" font-size="9">Booked: 3</text>
+    </g>
+  </g>
+
+  <!-- ===== PIPELINE FUNNEL (Row 2 Right) ===== -->
+  <g filter="url(#shadow2)">
+    <rect x="835" y="200" width="310" height="210" rx="14" fill="url(#card2)" stroke="#2d2d4a" stroke-width="0.5"/>
+    <text x="855" y="230" fill="#e2e8f0" font-size="14" font-weight="600">Pipeline Funnel</text>
+
+    <!-- Funnel bars -->
+    <g>
+      <!-- Researched -->
+      <rect x="870" y="250" width="250" height="24" rx="4" fill="#6366f1" opacity="0.2"/>
+      <rect x="870" y="250" width="0" height="24" rx="4" fill="#6366f1" opacity="0.6">
+        <animate attributeName="width" from="0" to="250" dur="0.8s" begin="0.5s" fill="freeze"/>
+      </rect>
+      <text x="880" y="266" fill="#fff" font-size="10" font-weight="600">Researched</text>
+      <text x="1100" y="266" fill="#a78bfa" font-size="10" font-weight="700" text-anchor="end">247</text>
+
+      <!-- Emailed -->
+      <rect x="870" y="280" width="200" height="24" rx="4" fill="#06b6d4" opacity="0.2"/>
+      <rect x="870" y="280" width="0" height="24" rx="4" fill="#06b6d4" opacity="0.6">
+        <animate attributeName="width" from="0" to="200" dur="0.8s" begin="0.7s" fill="freeze"/>
+      </rect>
+      <text x="880" y="296" fill="#fff" font-size="10" font-weight="600">Emailed</text>
+      <text x="1050" y="296" fill="#22d3ee" font-size="10" font-weight="700" text-anchor="end">189</text>
+
+      <!-- Replied -->
+      <rect x="870" y="310" width="90" height="24" rx="4" fill="#10b981" opacity="0.2"/>
+      <rect x="870" y="310" width="0" height="24" rx="4" fill="#10b981" opacity="0.6">
+        <animate attributeName="width" from="0" to="90" dur="0.8s" begin="0.9s" fill="freeze"/>
+      </rect>
+      <text x="880" y="326" fill="#fff" font-size="10" font-weight="600">Replied</text>
+      <text x="945" y="326" fill="#34d399" font-size="10" font-weight="700" text-anchor="end">42</text>
+
+      <!-- Engaged -->
+      <rect x="870" y="340" width="50" height="24" rx="4" fill="#f59e0b" opacity="0.2"/>
+      <rect x="870" y="340" width="0" height="24" rx="4" fill="#f59e0b" opacity="0.6">
+        <animate attributeName="width" from="0" to="50" dur="0.8s" begin="1.1s" fill="freeze"/>
+      </rect>
+      <text x="880" y="356" fill="#fff" font-size="10" font-weight="600">Engaged</text>
+
+      <!-- Booked -->
+      <rect x="870" y="370" width="35" height="24" rx="4" fill="#10b981" opacity="0.2"/>
+      <rect x="870" y="370" width="0" height="24" rx="4" fill="#10b981" opacity="0.8">
+        <animate attributeName="width" from="0" to="35" dur="0.8s" begin="1.3s" fill="freeze"/>
+      </rect>
+      <text x="880" y="386" fill="#fff" font-size="10" font-weight="700">Booked</text>
+    </g>
+
+    <!-- Conversion labels -->
+    <text x="1130" y="296" fill="#64748b" font-size="8">76%</text>
+    <text x="1130" y="326" fill="#64748b" font-size="8">22%</text>
+    <text x="1130" y="386" fill="#64748b" font-size="8">14%</text>
+  </g>
+
+  <!-- ===== REPLY QUEUE (Row 3 Left) ===== -->
+  <g filter="url(#shadow2)">
+    <rect x="240" y="425" width="580" height="295" rx="14" fill="url(#card2)" stroke="#2d2d4a" stroke-width="0.5"/>
+    <text x="260" y="455" fill="#e2e8f0" font-size="14" font-weight="600">Reply Queue</text>
+    <rect x="370" y="440" width="55" height="20" rx="10" fill="#f43f5e" opacity="0.15"/>
+    <text x="397" y="454" text-anchor="middle" fill="#fb7185" font-size="10" font-weight="600">7 new</text>
+
+    <!-- Column headers -->
+    <text x="260" y="485" fill="#475569" font-size="9" font-weight="600" letter-spacing="0.5">CONTACT</text>
+    <text x="420" y="485" fill="#475569" font-size="9" font-weight="600" letter-spacing="0.5">CLASSIFICATION</text>
+    <text x="570" y="485" fill="#475569" font-size="9" font-weight="600" letter-spacing="0.5">CONFIDENCE</text>
+    <text x="680" y="485" fill="#475569" font-size="9" font-weight="600" letter-spacing="0.5">ACTION</text>
+    <line x1="255" y1="492" x2="805" y2="492" stroke="#2d2d4a" stroke-width="0.5"/>
+
+    <!-- Reply row 1: Positive -->
+    <g class="slide-1">
+      <rect x="248" y="498" width="564" height="48" rx="6" fill="#10b981" opacity="0.04"/>
+      <circle cx="270" cy="522" r="14" fill="#1a1a35"/>
+      <text x="270" y="527" text-anchor="middle" fill="#34d399" font-size="11" font-weight="700">JS</text>
+      <text x="295" y="517" fill="#e2e8f0" font-size="11" font-weight="500">John Smith</text>
+      <text x="295" y="532" fill="#64748b" font-size="9">Acme Corp</text>
+      <rect x="420" y="510" width="65" height="20" rx="10" fill="#10b981" opacity="0.15"/>
+      <text x="452" y="524" text-anchor="middle" fill="#34d399" font-size="9" font-weight="600">Positive</text>
+      <!-- Confidence bar -->
+      <rect x="570" y="518" width="60" height="5" rx="2.5" fill="#1a1a35"/>
+      <rect x="570" y="518" width="54" height="5" rx="2.5" fill="url(#greenGrad)"/>
+      <text x="636" y="524" fill="#34d399" font-size="9">92%</text>
+      <!-- Action button -->
+      <rect x="680" y="510" width="75" height="22" rx="6" fill="url(#greenGrad)" opacity="0.8"/>
+      <text x="717" y="525" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">Book</text>
+    </g>
+
+    <!-- Reply row 2: Objection -->
+    <g class="slide-2">
+      <rect x="248" y="552" width="564" height="48" rx="6" fill="#f59e0b" opacity="0.03"/>
+      <circle cx="270" cy="576" r="14" fill="#1a1a35"/>
+      <text x="270" y="581" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="700">ML</text>
+      <text x="295" y="571" fill="#e2e8f0" font-size="11" font-weight="500">Maria Lopez</text>
+      <text x="295" y="586" fill="#64748b" font-size="9">TechStart</text>
+      <rect x="420" y="564" width="75" height="20" rx="10" fill="#f59e0b" opacity="0.15"/>
+      <text x="457" y="578" text-anchor="middle" fill="#fbbf24" font-size="9" font-weight="600">Objection</text>
+      <rect x="570" y="572" width="60" height="5" rx="2.5" fill="#1a1a35"/>
+      <rect x="570" y="572" width="48" height="5" rx="2.5" fill="url(#amberGrad)"/>
+      <text x="636" y="578" fill="#fbbf24" font-size="9">85%</text>
+      <rect x="680" y="564" width="75" height="22" rx="6" fill="#252545" stroke="#f59e0b" stroke-width="0.5"/>
+      <text x="717" y="579" text-anchor="middle" fill="#fbbf24" font-size="9" font-weight="600">Rebuttal</text>
+    </g>
+
+    <!-- Reply row 3: Positive -->
+    <g class="slide-3">
+      <rect x="248" y="606" width="564" height="48" rx="6" fill="#10b981" opacity="0.04"/>
+      <circle cx="270" cy="630" r="14" fill="#1a1a35"/>
+      <text x="270" y="635" text-anchor="middle" fill="#22d3ee" font-size="11" font-weight="700">AK</text>
+      <text x="295" y="625" fill="#e2e8f0" font-size="11" font-weight="500">Alex Kim</text>
+      <text x="295" y="640" fill="#64748b" font-size="9">DataFlow</text>
+      <rect x="420" y="618" width="65" height="20" rx="10" fill="#10b981" opacity="0.15"/>
+      <text x="452" y="632" text-anchor="middle" fill="#34d399" font-size="9" font-weight="600">Positive</text>
+      <rect x="570" y="626" width="60" height="5" rx="2.5" fill="#1a1a35"/>
+      <rect x="570" y="626" width="56" height="5" rx="2.5" fill="url(#greenGrad)"/>
+      <text x="636" y="632" fill="#34d399" font-size="9">95%</text>
+      <rect x="680" y="618" width="75" height="22" rx="6" fill="url(#greenGrad)" opacity="0.8"/>
+      <text x="717" y="633" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">Book</text>
+    </g>
+
+    <!-- Reply row 4: Unsubscribe -->
+    <g class="slide-4">
+      <rect x="248" y="660" width="564" height="48" rx="6" fill="#f43f5e" opacity="0.03"/>
+      <circle cx="270" cy="684" r="14" fill="#1a1a35"/>
+      <text x="270" y="689" text-anchor="middle" fill="#fb7185" font-size="11" font-weight="700">RP</text>
+      <text x="295" y="679" fill="#e2e8f0" font-size="11" font-weight="500">Rob Park</text>
+      <text x="295" y="694" fill="#64748b" font-size="9">CloudBase</text>
+      <rect x="420" y="672" width="85" height="20" rx="10" fill="#f43f5e" opacity="0.15"/>
+      <text x="462" y="686" text-anchor="middle" fill="#fb7185" font-size="9" font-weight="600">Unsubscribe</text>
+      <rect x="570" y="680" width="60" height="5" rx="2.5" fill="#1a1a35"/>
+      <rect x="570" y="680" width="58" height="5" rx="2.5" fill="url(#roseGrad)"/>
+      <text x="636" y="686" fill="#fb7185" font-size="9">98%</text>
+      <rect x="680" y="672" width="75" height="22" rx="6" fill="#252545" stroke="#475569" stroke-width="0.5"/>
+      <text x="717" y="687" text-anchor="middle" fill="#64748b" font-size="9" font-weight="500">Auto-paused</text>
+    </g>
+  </g>
+
+  <!-- ===== REASONING LOG (Row 3 Right) ===== -->
+  <g filter="url(#shadow2)">
+    <rect x="835" y="425" width="310" height="295" rx="14" fill="url(#card2)" stroke="#2d2d4a" stroke-width="0.5"/>
+    <text x="855" y="455" fill="#e2e8f0" font-size="14" font-weight="600">Reasoning Log</text>
+    <text x="855" y="472" fill="#64748b" font-size="10">Why was this email sent?</text>
+
+    <!-- Log entry -->
+    <rect x="850" y="485" width="280" height="220" rx="8" fill="#252545" stroke="#3d3d5c" stroke-width="0.5"/>
+
+    <!-- Signal -->
+    <rect x="862" y="495" width="12" height="12" rx="3" fill="#6366f1" opacity="0.3"/>
+    <text x="880" y="505" fill="#a78bfa" font-size="9" font-weight="600">SIGNAL TRIGGERED</text>
+    <text x="862" y="520" fill="#e2e8f0" font-size="10">Acme Corp raised Series B ($12M)</text>
+    <text x="862" y="534" fill="#64748b" font-size="9">Source: Crunchbase, 2 days ago</text>
+
+    <line x1="862" y1="545" x2="1118" y2="545" stroke="#2d2d4a" stroke-width="0.5"/>
+
+    <!-- Rule -->
+    <rect x="862" y="555" width="12" height="12" rx="3" fill="#06b6d4" opacity="0.3"/>
+    <text x="880" y="565" fill="#22d3ee" font-size="9" font-weight="600">RULE MATCHED</text>
+    <text x="862" y="580" fill="#e2e8f0" font-size="10">ICP: SaaS, Series B, 50-200 emp</text>
+    <text x="862" y="594" fill="#64748b" font-size="9">Fit score: 0.91</text>
+
+    <line x1="862" y1="605" x2="1118" y2="605" stroke="#2d2d4a" stroke-width="0.5"/>
+
+    <!-- Message choice -->
+    <rect x="862" y="615" width="12" height="12" rx="3" fill="#f59e0b" opacity="0.3"/>
+    <text x="880" y="625" fill="#fbbf24" font-size="9" font-weight="600">MESSAGE PERSONALIZATION</text>
+    <text x="862" y="640" fill="#e2e8f0" font-size="10">Voice: direct, data-driven</text>
+    <text x="862" y="654" fill="#e2e8f0" font-size="10">Hook: funding news + product fit</text>
+    <text x="862" y="668" fill="#64748b" font-size="9">CTA: reply yes/no</text>
+
+    <line x1="862" y1="678" x2="1118" y2="678" stroke="#2d2d4a" stroke-width="0.5"/>
+
+    <!-- Next step -->
+    <rect x="862" y="688" width="12" height="12" rx="3" fill="#10b981" opacity="0.3"/>
+    <text x="880" y="698" fill="#34d399" font-size="9" font-weight="600">NEXT STEP</text>
+    <text x="862" y="693" fill="#e2e8f0" font-size="10">Follow-up in 3 days if no reply</text>
+  </g>
+
+  <!-- ===== BOTTOM STATUS BAR ===== -->
+  <rect x="220" y="740" width="980" height="40" fill="#12122a" opacity="0.6"/>
+  <line x1="220" y1="740" x2="1200" y2="740" stroke="#2d2d4a" stroke-width="0.5"/>
+  <circle cx="250" cy="760" r="4" fill="#10b981">
+    <animate attributeName="opacity" values="1;0.3;1" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <text x="262" y="764" fill="#64748b" font-size="10">Agent active</text>
+  <text x="400" y="764" fill="#475569" font-size="10">Next send: 3 emails in 12 min</text>
+  <text x="620" y="764" fill="#475569" font-size="10">Daily cap: 14/20 used</text>
+  <rect x="780" y="752" width="80" height="6" rx="3" fill="#1a1a35"/>
+  <rect x="780" y="752" width="56" height="6" rx="3" fill="url(#amberGrad)" opacity="0.7"/>
+  <text x="870" y="764" fill="#475569" font-size="10">Domain health: Good</text>
+</svg>

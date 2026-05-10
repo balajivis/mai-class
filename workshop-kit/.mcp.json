@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "blackboard": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/mcp/server.mjs"],
+      "env": {
+        "WK_API": "${WK_API}",
+        "WK_TEAM": "${WK_TEAM}",
+        "WK_TOKEN": "${WK_TOKEN}",
+        "WK_AGENT": "${WK_AGENT}"
+      }
+    }
+  }
+}

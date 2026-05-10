@@ -1,0 +1,233 @@
+{
+  "main": {
+    "id": "ab9da6ceaa790d12",
+    "type": "split",
+    "children": [
+      {
+        "id": "a1e8fbd5b687d164",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1e210bef5a3ad022",
+            "type": "leaf",
+            "state": {
+              "type": "image",
+              "state": {
+                "file": "docs/designs/01-onboarding-flow.svg"
+              },
+              "icon": "lucide-image",
+              "title": "01-onboarding-flow"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "6440a2e062333e62",
+    "type": "split",
+    "children": [
+      {
+        "id": "ff7588835c851b15",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "cc52b8140805a26b",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "2973ac1db08a1879",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "eebdb513f7657b3a",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "2fc4dbff15bbac4b",
+    "type": "split",
+    "children": [
+      {
+        "id": "115bb2b3af067d6e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b39f9f8ec332f8bf",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "docs/designs/01-onboarding-flow.svg",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for 01-onboarding-flow"
+            }
+          },
+          {
+            "id": "2bdc8f72e87d2704",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "docs/designs/01-onboarding-flow.svg",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from 01-onboarding-flow"
+            }
+          },
+          {
+            "id": "46804f7539d7bb79",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "a633617a3f8e6f71",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "b16feafcc8db588b",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "docs/designs/01-onboarding-flow.svg",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of 01-onboarding-flow"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "1e210bef5a3ad022",
+  "lastOpenFiles": [
+    "infra/deploy.sh",
+    "infra/cloud-init.yaml",
+    "infra",
+    "ecosystem.config.cjs",
+    "tests/__helpers__/mocks.ts",
+    "tests/__helpers__",
+    "src/server.ts",
+    "src/jobs/accountResearch.job.ts",
+    "src/jobs/followUpScheduler.job.ts",
+    "src/jobs/replyClassifier.job.ts",
+    "src/jobs/inboxPoller.job.ts",
+    "docs/designs/02-core-dashboard.svg",
+    "node_modules/lodash/README.md",
+    "node_modules/zod/README.md",
+    "node_modules/typescript/SECURITY.md",
+    "node_modules/typescript/README.md",
+    "node_modules/@trpc/server/README.md",
+    "node_modules/prisma/build/public/favicon.svg",
+    "node_modules/@esbuild/darwin-arm64/README.md",
+    "node_modules/vite/node_modules/@esbuild/darwin-arm64/README.md",
+    "node_modules/prisma/build/public/icon-1024.png",
+    "node_modules/prisma/prisma-client/README.md",
+    "node_modules/prisma/README.md",
+    "node_modules/luxon/README.md",
+    "node_modules/luxon/LICENSE.md",
+    "node_modules/@anthropic-ai/sdk/src/_vendor/partial-json-parser/README.md",
+    "node_modules/@anthropic-ai/sdk/src/_shims/README.md",
+    "node_modules/bull/README.md",
+    "node_modules/bull/LICENSE.md",
+    "node_modules/bull/CHANGELOG.md",
+    "node_modules/vitest/README.md",
+    "node_modules/vitest/LICENSE.md",
+    "node_modules/prisma/build/public/assets/tick.8cbb6a93.svg",
+    "node_modules/prisma/build/public/assets/tick-indeterminate.aec8a44d.svg",
+    "node_modules/prisma/build/public/assets/string.ea615a24.svg",
+    "node_modules/prisma/build/public/assets/settings.5ad25af2.svg",
+    "node_modules/prisma/build/public/assets/search.2ed766ce.svg",
+    "node_modules/prisma/build/public/assets/refresh.d5448ccc.svg",
+    "node_modules/prisma/build/public/assets/plus.8fbf7ad3.svg",
+    "node_modules/vite/README.md",
+    "node_modules/vite/LICENSE.md",
+    "node_modules/rollup/README.md",
+    "node_modules/uuid/CONTRIBUTING.md",
+    "node_modules/uuid/README.md",
+    "node_modules/uuid/CHANGELOG.md",
+    "node_modules/uuid/LICENSE.md"
+  ]
+}

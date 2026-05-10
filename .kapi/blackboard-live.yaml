@@ -1,0 +1,17 @@
+blackboard:
+  project: mai-class
+  description: Shared state
+agents: {}
+directives: []
+log: []
+transports:
+  shim-57392:
+    status: active
+    last_seen: 2026-05-10T00:49:38Z
+    port: 57392
+    gemini: disabled
+  shim-57516:
+    status: active
+    last_seen: 2026-05-10T00:50:06Z
+    port: 57516
+    gemini: disabled

@@ -1,0 +1,271 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" font-family="'Inter', 'SF Pro Display', -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="bg4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f1a"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="card4" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e1e35"/>
+      <stop offset="100%" style="stop-color:#16162b"/>
+    </linearGradient>
+    <linearGradient id="inboxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="positiveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#10b981"/>
+      <stop offset="100%" style="stop-color:#34d399"/>
+    </linearGradient>
+    <linearGradient id="objectionGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f59e0b"/>
+      <stop offset="100%" style="stop-color:#fbbf24"/>
+    </linearGradient>
+    <linearGradient id="unsubGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f43f5e"/>
+      <stop offset="100%" style="stop-color:#fb7185"/>
+    </linearGradient>
+    <linearGradient id="noiseGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#475569"/>
+      <stop offset="100%" style="stop-color:#64748b"/>
+    </linearGradient>
+
+    <filter id="glow4">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="shadow4">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+
+    <style>
+      @keyframes flowPulse { to { stroke-dashoffset: -16; } }
+      @keyframes nodeAppear { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+      @keyframes branchReveal { from { stroke-dashoffset: 200; } to { stroke-dashoffset: 0; } }
+      @keyframes badgePop { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
+      .flow-pulse { stroke-dasharray: 6 4; animation: flowPulse 0.8s linear infinite; }
+      .node-1 { animation: nodeAppear 0.5s ease-out 0.2s both; }
+      .node-2 { animation: nodeAppear 0.5s ease-out 0.5s both; }
+      .node-3 { animation: nodeAppear 0.5s ease-out 0.8s both; }
+      .branch-a { animation: nodeAppear 0.5s ease-out 1.1s both; }
+      .branch-b { animation: nodeAppear 0.5s ease-out 1.3s both; }
+      .branch-c { animation: nodeAppear 0.5s ease-out 1.5s both; }
+      .branch-d { animation: nodeAppear 0.5s ease-out 1.7s both; }
+      .outcome-1 { animation: nodeAppear 0.5s ease-out 1.9s both; }
+      .outcome-2 { animation: nodeAppear 0.5s ease-out 2.1s both; }
+      .outcome-3 { animation: nodeAppear 0.5s ease-out 2.3s both; }
+      .outcome-4 { animation: nodeAppear 0.5s ease-out 2.5s both; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="800" fill="url(#bg4)"/>
+  <g opacity="0.02">
+    <pattern id="grid4" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#fff" stroke-width="0.5"/>
+    </pattern>
+    <rect width="1200" height="800" fill="url(#grid4)"/>
+  </g>
+
+  <!-- Title -->
+  <text x="600" y="45" text-anchor="middle" fill="#e2e8f0" font-size="28" font-weight="700">Reply Handling Decision Tree</text>
+  <text x="600" y="70" text-anchor="middle" fill="#94a3b8" font-size="14" letter-spacing="1">CLASSIFICATION + ACTION ROUTING BY AUTONOMY LEVEL</text>
+
+  <!-- ===== INBOX MONITOR NODE ===== -->
+  <g class="node-1" filter="url(#shadow4)">
+    <rect x="470" y="95" width="260" height="80" rx="16" fill="url(#card4)" stroke="#6366f1" stroke-width="1.5"/>
+    <rect x="470" y="95" width="260" height="4" rx="2" fill="url(#inboxGrad)"/>
+    <!-- Inbox icon -->
+    <rect x="495" y="118" width="28" height="22" rx="4" fill="none" stroke="#818cf8" stroke-width="1.5"/>
+    <polyline points="495,122 509,133 523,122" fill="none" stroke="#818cf8" stroke-width="1.5"/>
+    <!-- Polling indicator -->
+    <circle cx="510" cy="158" r="3" fill="#10b981">
+      <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <text x="520" y="162" fill="#64748b" font-size="9">Polling every 5 min</text>
+    <text x="535" y="135" fill="#e2e8f0" font-size="15" font-weight="700">Inbox Monitor</text>
+    <text x="535" y="155" fill="#94a3b8" font-size="10">Gmail / Outlook webhook</text>
+  </g>
+
+  <!-- Arrow down to classifier -->
+  <line x1="600" y1="175" x2="600" y2="210" stroke="#6366f1" stroke-width="1.5" class="flow-pulse" opacity="0.6"/>
+  <!-- Data packet animation -->
+  <rect width="8" height="4" rx="2" fill="#818cf8">
+    <animateMotion path="M600,175 L600,210" dur="1.5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;1;1;0" dur="1.5s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- ===== CLASSIFIER NODE ===== -->
+  <g class="node-2" filter="url(#shadow4)">
+    <!-- Diamond shape using rotated rect -->
+    <rect x="540" y="210" width="120" height="80" rx="14" fill="url(#card4)" stroke="#8b5cf6" stroke-width="1.5"/>
+    <text x="600" y="245" text-anchor="middle" fill="#a78bfa" font-size="13" font-weight="700">AI Classifier</text>
+    <text x="600" y="263" text-anchor="middle" fill="#64748b" font-size="9">LLM + rules engine</text>
+    <!-- Processing indicator -->
+    <circle cx="600" cy="278" r="2" fill="#a78bfa">
+      <animate attributeName="opacity" values="0;1;0" dur="1s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- ===== CONFIDENCE GATE ===== -->
+  <g class="node-3">
+    <!-- Confidence bar -->
+    <rect x="530" y="305" width="140" height="24" rx="12" fill="#252545" stroke="#3d3d5c" stroke-width="0.5"/>
+    <text x="600" y="321" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">Confidence Threshold</text>
+    <!-- Animated fill -->
+    <rect x="535" y="332" width="130" height="4" rx="2" fill="#1a1a35"/>
+    <rect x="535" y="332" width="0" height="4" rx="2" fill="url(#inboxGrad)">
+      <animate attributeName="width" from="0" to="91" dur="1.5s" begin="1s" fill="freeze"/>
+    </rect>
+    <text x="670" y="338" fill="#a78bfa" font-size="8">0.7</text>
+  </g>
+
+  <!-- ===== BRANCHING ARROWS ===== -->
+  <!-- Branch to Positive -->
+  <path d="M540 300 Q540 360 400 360 L280 360" stroke="#10b981" stroke-width="1.5" fill="none" class="flow-pulse" opacity="0.5"/>
+  <!-- Branch to Objection -->
+  <path d="M555 300 Q520 400 440 430 L330 430" stroke="#f59e0b" stroke-width="1.5" fill="none" class="flow-pulse" opacity="0.5"/>
+  <!-- Branch to Unsubscribe -->
+  <path d="M645 300 Q680 400 760 430 L870 430" stroke="#f43f5e" stroke-width="1.5" fill="none" class="flow-pulse" opacity="0.5"/>
+  <!-- Branch to Noise -->
+  <path d="M660 300 Q660 360 800 360 L920 360" stroke="#475569" stroke-width="1.5" fill="none" class="flow-pulse" opacity="0.5"/>
+
+  <!-- ===== CLASSIFICATION CARDS ===== -->
+
+  <!-- POSITIVE -->
+  <g class="branch-a" filter="url(#shadow4)">
+    <rect x="60" y="330" width="220" height="130" rx="14" fill="url(#card4)" stroke="#10b981" stroke-width="1"/>
+    <rect x="60" y="330" width="220" height="4" rx="2" fill="url(#positiveGrad)"/>
+    <rect x="80" y="350" width="65" height="22" rx="11" fill="#10b981" opacity="0.15"/>
+    <text x="112" y="365" text-anchor="middle" fill="#34d399" font-size="10" font-weight="700">POSITIVE</text>
+    <text x="80" y="390" fill="#e2e8f0" font-size="10">Shows interest, ready to discuss</text>
+    <text x="80" y="408" fill="#94a3b8" font-size="9">"Sounds interesting, let's chat"</text>
+    <!-- Confidence -->
+    <text x="80" y="435" fill="#64748b" font-size="8">Typical confidence:</text>
+    <rect x="170" y="428" width="50" height="4" rx="2" fill="#1a1a35"/>
+    <rect x="170" y="428" width="46" height="4" rx="2" fill="url(#positiveGrad)"/>
+    <text x="225" y="435" fill="#34d399" font-size="8">92%</text>
+
+    <!-- Percentage -->
+    <text x="245" y="365" fill="#34d399" font-size="18" font-weight="700" text-anchor="end">~15%</text>
+  </g>
+
+  <!-- OBJECTION -->
+  <g class="branch-b" filter="url(#shadow4)">
+    <rect x="60" y="480" width="270" height="180" rx="14" fill="url(#card4)" stroke="#f59e0b" stroke-width="1"/>
+    <rect x="60" y="480" width="270" height="4" rx="2" fill="url(#objectionGrad)"/>
+    <rect x="80" y="500" width="78" height="22" rx="11" fill="#f59e0b" opacity="0.15"/>
+    <text x="119" y="515" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="700">OBJECTION</text>
+    <text x="288" y="515" fill="#fbbf24" font-size="18" font-weight="700" text-anchor="end">~25%</text>
+
+    <text x="80" y="540" fill="#e2e8f0" font-size="10">Concern raised about fit</text>
+
+    <!-- Objection types -->
+    <rect x="80" y="555" width="230" height="90" rx="8" fill="#252545" stroke="#3d3d5c" stroke-width="0.5"/>
+    <text x="90" y="573" fill="#fbbf24" font-size="8" font-weight="600">COMMON TYPES</text>
+    <circle cx="95" cy="590" r="2" fill="#f59e0b"/>
+    <text x="105" y="594" fill="#94a3b8" font-size="9">already_using_competitor</text>
+    <circle cx="95" cy="607" r="2" fill="#f59e0b"/>
+    <text x="105" y="611" fill="#94a3b8" font-size="9">budget_constraint</text>
+    <circle cx="95" cy="624" r="2" fill="#f59e0b"/>
+    <text x="105" y="628" fill="#94a3b8" font-size="9">bad_timing</text>
+    <circle cx="95" cy="641" r="2" fill="#f59e0b"/>
+    <text x="105" y="645" fill="#94a3b8" font-size="9">not_decision_maker</text>
+  </g>
+
+  <!-- UNSUBSCRIBE -->
+  <g class="branch-c" filter="url(#shadow4)">
+    <rect x="870" y="400" width="220" height="110" rx="14" fill="url(#card4)" stroke="#f43f5e" stroke-width="1"/>
+    <rect x="870" y="400" width="220" height="4" rx="2" fill="url(#unsubGrad)"/>
+    <rect x="890" y="420" width="85" height="22" rx="11" fill="#f43f5e" opacity="0.15"/>
+    <text x="932" y="435" text-anchor="middle" fill="#fb7185" font-size="10" font-weight="700">UNSUBSCRIBE</text>
+    <text x="1055" y="435" fill="#fb7185" font-size="18" font-weight="700" text-anchor="end">~8%</text>
+
+    <text x="890" y="460" fill="#e2e8f0" font-size="10">Explicit opt-out request</text>
+    <text x="890" y="478" fill="#94a3b8" font-size="9">"Please stop emailing me"</text>
+    <text x="890" y="498" fill="#fb7185" font-size="9" font-weight="600">Auto-handled at all levels</text>
+  </g>
+
+  <!-- NOISE -->
+  <g class="branch-d" filter="url(#shadow4)">
+    <rect x="870" y="310" width="220" height="75" rx="14" fill="url(#card4)" stroke="#475569" stroke-width="1"/>
+    <rect x="870" y="310" width="220" height="4" rx="2" fill="url(#noiseGrad)"/>
+    <rect x="890" y="328" width="50" height="22" rx="11" fill="#475569" opacity="0.2"/>
+    <text x="915" y="343" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="700">NOISE</text>
+    <text x="1055" y="343" fill="#64748b" font-size="18" font-weight="700" text-anchor="end">~52%</text>
+
+    <text x="890" y="366" fill="#e2e8f0" font-size="10">OOO, bounce, spam</text>
+    <text x="890" y="380" fill="#64748b" font-size="9">Auto-archived at all levels</text>
+  </g>
+
+  <!-- ===== OUTCOME ACTIONS ===== -->
+
+  <!-- Arrow from Positive to Book Meeting -->
+  <path d="M170 460 L170 520 Q170 540 190 540 L380 540" stroke="#10b981" stroke-width="1.5" fill="none" class="flow-pulse" opacity="0.4"/>
+
+  <!-- Book Meeting outcome -->
+  <g class="outcome-1" filter="url(#shadow4)">
+    <rect x="380" y="520" width="200" height="65" rx="12" fill="url(#card4)" stroke="#10b981" stroke-width="1.5"/>
+    <circle cx="405" cy="552" r="14" fill="#10b981" opacity="0.12"/>
+    <text x="405" y="557" text-anchor="middle" fill="#34d399" font-size="14">&#10003;</text>
+    <text x="428" y="547" fill="#e2e8f0" font-size="12" font-weight="600">Propose Calendar</text>
+    <text x="428" y="565" fill="#64748b" font-size="9">L1-L2: rep sends | L3+: auto</text>
+
+    <!-- Animated checkmark -->
+    <circle cx="560" cy="552" r="8" fill="none" stroke="#10b981" stroke-width="1" opacity="0">
+      <animate attributeName="opacity" values="0;0.5;0" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="8;16;8" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Arrow from Objection -->
+  <path d="M330 570 L380 570 Q400 570 400 590 L400 610 Q400 625 420 625 L450 625" stroke="#f59e0b" stroke-width="1.5" fill="none" class="flow-pulse" opacity="0.4"/>
+
+  <!-- Objection handling outcome -->
+  <g class="outcome-2" filter="url(#shadow4)">
+    <rect x="450" y="600" width="290" height="120" rx="12" fill="url(#card4)" stroke="#f59e0b" stroke-width="1"/>
+    <text x="475" y="625" fill="#fbbf24" font-size="11" font-weight="700">Objection Response</text>
+
+    <!-- By autonomy level -->
+    <rect x="470" y="638" width="250" height="26" rx="6" fill="#252545" stroke="#3d3d5c" stroke-width="0.5"/>
+    <text x="485" y="655" fill="#a78bfa" font-size="9" font-weight="600">L1-L2</text>
+    <text x="530" y="655" fill="#94a3b8" font-size="9">Escalate to rep with context</text>
+
+    <rect x="470" y="670" width="250" height="26" rx="6" fill="#252545" stroke="#f59e0b" stroke-width="0.5"/>
+    <text x="485" y="687" fill="#fbbf24" font-size="9" font-weight="600">L3-L4</text>
+    <text x="530" y="687" fill="#94a3b8" font-size="9">Auto-generate rebuttal</text>
+    <text x="690" y="687" fill="#fbbf24" font-size="8">(if conf > 0.7)</text>
+  </g>
+
+  <!-- Arrow from Unsubscribe -->
+  <path d="M980 510 L980 545 Q980 560 960 560 L820 560" stroke="#f43f5e" stroke-width="1.5" fill="none" class="flow-pulse" opacity="0.4"/>
+
+  <!-- Unsubscribe outcome -->
+  <g class="outcome-3" filter="url(#shadow4)">
+    <rect x="770" y="540" width="180" height="55" rx="12" fill="url(#card4)" stroke="#f43f5e" stroke-width="1"/>
+    <text x="795" y="563" fill="#fb7185" font-size="11" font-weight="700">Pause Sequence</text>
+    <text x="795" y="580" fill="#64748b" font-size="9">Mark in CRM + stop emails</text>
+    <!-- X icon -->
+    <circle cx="925" cy="567" r="10" fill="#f43f5e" opacity="0.1"/>
+    <text x="925" y="572" text-anchor="middle" fill="#fb7185" font-size="12" font-weight="700">x</text>
+  </g>
+
+  <!-- Arrow from Noise -->
+  <path d="M980 385 L980 415 Q980 430 960 430 L870 430 Q850 430 850 450 L850 465" stroke="#475569" stroke-width="1" fill="none" class="flow-pulse" opacity="0.3"/>
+
+  <!-- Noise outcome -->
+  <g class="outcome-4" filter="url(#shadow4)">
+    <rect x="770" y="465" width="160" height="45" rx="12" fill="url(#card4)" stroke="#475569" stroke-width="0.5"/>
+    <text x="795" y="488" fill="#94a3b8" font-size="11" font-weight="600">Archive</text>
+    <text x="795" y="503" fill="#64748b" font-size="9">No action needed</text>
+  </g>
+
+  <!-- ===== REASONING LOG NOTE ===== -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="3s" fill="freeze"/>
+    <rect x="380" y="740" width="440" height="45" rx="12" fill="url(#card4)" stroke="#8b5cf6" stroke-width="0.5"/>
+    <circle cx="406" cy="762" r="10" fill="#8b5cf6" opacity="0.1"/>
+    <text x="406" y="767" text-anchor="middle" fill="#a78bfa" font-size="12">i</text>
+    <text x="425" y="758" fill="#e2e8f0" font-size="11" font-weight="600">Every action logged with reasoning</text>
+    <text x="425" y="774" fill="#64748b" font-size="9">Signal triggered + rule applied + why this action + what's next</text>
+  </g>
+</svg>

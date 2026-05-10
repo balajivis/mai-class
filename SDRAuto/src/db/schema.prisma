@@ -1,0 +1,282 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  passwordHash  String?
+  name          String?
+  role          String    @default("founder")
+
+  // Settings
+  autonomyLevel  String @default("L2")
+  dailyEmailCap  Int    @default(20)
+  domainEmailCap Int    @default(5)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  campaigns     Campaign[]
+  outreach      Outreach[]
+  voiceProfiles VoiceProfile[]
+  oauthTokens   OAuthToken[]
+
+  @@index([email])
+}
+
+model Campaign {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name          String
+  icpDefinition Json
+  status        String @default("draft")
+  autonomyLevel String @default("L2")
+
+  // Denormalized stats
+  accountsAdded    Int @default(0)
+  firstTouchesSent Int @default(0)
+  repliesReceived  Int @default(0)
+  meetingsBooked   Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  outreach Outreach[]
+  accounts Account[]
+
+  @@index([userId, status])
+  @@index([createdAt])
+}
+
+model Account {
+  id         String   @id @default(cuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  domain      String
+  companyName String
+  buyerEmail  String?
+  buyerRole   String?
+
+  createdAt DateTime @default(now())
+
+  @@index([campaignId])
+  @@index([domain])
+}
+
+model VoiceProfile {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tone              String
+  sentenceStructure String
+  emojiUsage        Boolean
+  avgMessageLength  Int
+  commonOpeners     String[]
+  signOffPatterns   String[]
+  valuePropStyle    String
+
+  confidenceScore  Float
+  sourceEmailCount Int
+  validatedByUser  Boolean @default(false)
+
+  extractedFeatures Json
+  sourceEmails      Json? // Store raw email IDs for curation
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Outreach {
+  id         String   @id @default(cuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  accountId   String
+  accountName String
+  buyerEmail  String
+  buyerName   String?
+
+  researchBrief  Json?
+  voiceProfileId String?
+
+  status             String @default("researched")
+  autonomyAtCreation String @default("L2")
+
+  firstTouchId String?
+  followUpIds  String[] @default([])
+
+  reasoningLog String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  messages         Message[]
+  replies          Reply[]
+  calendarProposal CalendarProposal?
+  bookedMeeting    BookedMeeting?
+
+  @@index([campaignId, status])
+  @@index([userId, status])
+  @@index([updatedAt])
+  @@index([buyerEmail])
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  outreachId String
+  outreach   Outreach @relation(fields: [outreachId], references: [id], onDelete: Cascade)
+
+  messageType    String
+  direction      String
+  senderEmail    String
+  recipientEmail String
+  subject        String
+  body           String @db.Text
+
+  personalizationUsed  String[]
+  voiceConfidenceScore Float?
+
+  status     String @default("draft")
+  approvalBy String?
+
+  sentTimestamp    DateTime?
+  bouncedTimestamp DateTime?
+
+  openTracked   Boolean @default(false)
+  replyReceived Boolean @default(false)
+
+  reasoningLog String  @db.Text
+  metadata     Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  reply Reply?
+
+  @@index([outreachId, direction])
+  @@index([status, sentTimestamp])
+  @@index([recipientEmail])
+}
+
+model Reply {
+  id        String   @id @default(cuid())
+  messageId String   @unique
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  outreachId String
+  outreach   Outreach @relation(fields: [outreachId], references: [id], onDelete: Cascade)
+
+  receivedTimestamp DateTime
+  senderEmail       String
+  subject           String
+  body              String @db.Text
+
+  classification     String
+  confidence         Float
+  objectionType      String?
+  extractedSentiment String?
+  extractedIntent    String?
+
+  actionTaken  String?
+  reasoningLog String  @db.Text
+
+  classifierFeedback Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([outreachId, classification])
+  @@index([receivedTimestamp])
+  @@index([confidence])
+}
+
+model CalendarProposal {
+  id         String   @id @default(cuid())
+  outreachId String   @unique
+  outreach   Outreach @relation(fields: [outreachId], references: [id], onDelete: Cascade)
+
+  proposedSlots    Json
+  proposedAt       DateTime
+  prospectResponse String   @default("pending")
+  acceptedSlot     DateTime?
+  bookedMeetingId  String?
+
+  reasoningLog String @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BookedMeeting {
+  id         String   @id @default(cuid())
+  outreachId String   @unique
+  outreach   Outreach @relation(fields: [outreachId], references: [id], onDelete: Cascade)
+
+  accountName  String
+  contactEmail String
+  contactName  String?
+
+  scheduledAt     DateTime
+  durationMinutes Int    @default(30)
+
+  meetingSource       String @default("autonomous_bdr")
+  conversationSummary String @db.Text
+  nextSteps           String?
+
+  syncedToCRM Boolean @default(false)
+  crmRecordId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([outreachId])
+  @@index([scheduledAt])
+}
+
+model OAuthToken {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  provider     String
+  accessToken  String  @db.Text
+  refreshToken String? @db.Text
+  expiresAt    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, provider])
+  @@index([userId])
+}
+
+model UnsubscribeList {
+  id     String @id @default(cuid())
+  userId String
+  email  String
+  domain String
+  reason String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, email])
+  @@index([userId, domain])
+}

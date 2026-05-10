@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.log
+db/blackboard.db
+db/blackboard.db-*
+.env
+.env.local
+.DS_Store

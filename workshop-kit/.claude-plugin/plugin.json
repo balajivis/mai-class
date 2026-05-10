@@ -1,0 +1,11 @@
+{
+  "name": "workshop-kit",
+  "version": "0.1.0",
+  "description": "Modern AI Pro · Multiagents-v2 hands-on. Bundles Agent Team definitions, blackboard hooks, MCP server, monitors, statusline, and slash skills for the live classroom workshop.",
+  "author": {
+    "name": "Modern AI Pro",
+    "url": "https://learn.modernaipro.com"
+  },
+  "homepage": "https://github.com/Kapi-IDE/workshop-kit",
+  "license": "MIT"
+}

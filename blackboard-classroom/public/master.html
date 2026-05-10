@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Blackboard · Master · Multiagents-v2</title>
+<link rel="stylesheet" href="/style.css" />
+<style>
+.master-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 14px;
+  padding: 14px;
+}
+.team-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr;
+  gap: 10px;
+  min-height: 320px;
+}
+.team-head { display: flex; justify-content: space-between; align-items: baseline; }
+.team-head .name { font-size: 14px; font-weight: 700; color: var(--text); }
+.team-head .proj { font-size: 11px; color: var(--text-3); font-family: ui-monospace, monospace; }
+.team-head .mode-badge {
+  font-size: 10px; padding: 2px 8px; border-radius: 999px;
+  background: var(--panel-2); color: var(--amber-soft); font-weight: 600;
+}
+.team-head .frozen-badge {
+  font-size: 10px; padding: 2px 8px; border-radius: 999px;
+  background: #7f1d1d; color: #fee2e2; font-weight: 600; margin-left: 6px;
+}
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.kpi { background: var(--panel-2); border-radius: 6px; padding: 6px 8px; }
+.kpi .v { font-size: 16px; font-weight: 700; color: var(--text); font-feature-settings: "tnum"; line-height: 1.1; }
+.kpi .l { font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); margin-top: 2px; }
+.kpi.good .v { color: var(--good); }
+.kpi.bad  .v { color: var(--bad); }
+.kpi.warn .v { color: var(--warn); }
+
+.l3-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; font-size: 11px; }
+.l3-grid .cell { background: var(--panel-2); border-radius: 4px; padding: 4px 6px; }
+.l3-grid .cell .v { color: var(--text); font-weight: 700; }
+.l3-grid .cell .l { color: var(--text-3); font-size: 9.5px; }
+
+.topology-wrap { background: var(--panel-2); border-radius: 6px; height: 180px; position: relative; overflow: hidden; }
+.topology-wrap svg { width: 100%; height: 100%; display: block; }
+.topology-wrap .empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--text-3); font-size: 11px; }
+.node circle { stroke-width: 1.5; cursor: pointer; }
+.node text { fill: var(--text-2); font: 10px ui-monospace, monospace; pointer-events: none; }
+.link { stroke-opacity: 0.5; }
+
+.scoreboard {
+  display: grid; grid-template-columns: 28px 1fr 80px 80px 80px;
+  gap: 8px; align-items: center;
+  padding: 8px 10px; border-bottom: 1px dashed var(--border); font-size: 12px;
+}
+.scoreboard.head { color: var(--text-3); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); }
+.rank { color: var(--amber-soft); font-weight: 700; font-feature-settings: "tnum"; }
+
+.bottom-bar { padding: 10px 20px; border-top: 1px solid var(--border); background: var(--panel); display: flex; justify-content: space-between; font-size: 11px; color: var(--text-3); }
+</style>
+</head>
+<body class="dark">
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">⌥</span>
+    <span class="title">Modern AI Pro · <em>Multiagents-v2</em> · Master View</span>
+  </div>
+  <div class="ctx">
+    <span id="conn-pill" class="conn">connecting…</span>
+    <span class="dot"></span>
+    <span id="last-update" class="role">—</span>
+  </div>
+</header>
+
+<section style="padding: 14px 14px 0;">
+  <div class="panel" style="padding: 10px 14px;">
+    <h2 style="margin:0 0 8px 0;">Leaderboard <span class="count" id="cohort-events">—</span></h2>
+    <div id="leaderboard"></div>
+  </div>
+</section>
+
+<main class="master-grid" id="teams"></main>
+
+<footer class="bottom-bar">
+  <span>Tier · L1 per-agent · L2 combined output · L3 coordination — three readings; the third is the one that fails silently</span>
+  <span id="poll-label">refresh 3s</span>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+
+  const cardCache = new Map();    // projectId -> { card, sim, links, nodes, svg, kpi nodes }
+  let lastFetch = 0;
+
+  function modeLabel(m) { return ({A:'Free-for-all',B:'Cap-matched',C:'Contract-net',D:'Reputation'}[m]) || m; }
+  function colourFor(name) {
+    if (!name) return '#71717a';
+    let h = 0; for (let i=0;i<name.length;i++) h = (h*31 + name.charCodeAt(i)) >>> 0;
+    return `hsl(${h % 360} 70% 60%)`;
+  }
+
+  function buildCard(projectId) {
+    const card = document.createElement('div');
+    card.className = 'team-card';
+    card.id = 'card-' + projectId;
+    card.innerHTML = `
+      <div class="team-head">
+        <div>
+          <span class="name" id="${projectId}-name"></span>
+          <span class="proj" id="${projectId}-projid">${projectId}</span>
+          <span class="mode-badge" id="${projectId}-mode"></span>
+          <span class="frozen-badge" id="${projectId}-frozen" style="display:none">FROZEN</span>
+        </div>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi" id="${projectId}-kpi-done">     <div class="v">—</div><div class="l">L2 · done</div></div>
+        <div class="kpi" id="${projectId}-kpi-rate">     <div class="v">—</div><div class="l">L2 · rate</div></div>
+        <div class="kpi" id="${projectId}-kpi-conf">     <div class="v">—</div><div class="l">L3 · conflicts</div></div>
+        <div class="kpi" id="${projectId}-kpi-tax">      <div class="v">—</div><div class="l">L3 · ev/min</div></div>
+      </div>
+      <div class="l3-grid">
+        <div class="cell"><div class="v" id="${projectId}-l3-channels">—</div><div class="l">channels</div></div>
+        <div class="cell"><div class="v" id="${projectId}-l3-idle">—</div><div class="l">idle</div></div>
+        <div class="cell"><div class="v" id="${projectId}-l3-redundancy">—</div><div class="l">redund.</div></div>
+        <div class="cell"><div class="v" id="${projectId}-l3-perf">—</div><div class="l">perf mix</div></div>
+        <div class="cell"><div class="v" id="${projectId}-l2-build">—</div><div class="l">build</div></div>
+      </div>
+      <div class="topology-wrap">
+        <svg id="${projectId}-svg"></svg>
+        <div class="empty" id="${projectId}-empty">topology forming…</div>
+      </div>`;
+    $('teams').appendChild(card);
+    cardCache.set(projectId, { card });
+    return cardCache.get(projectId);
+  }
+
+  function updateCard(p) {
+    if (!cardCache.has(p.project.id)) buildCard(p.project.id);
+    const id = p.project.id;
+    $(`${id}-name`).textContent = p.project.name;
+    $(`${id}-mode`).textContent = `Mode ${p.project.alloc_mode} · ${modeLabel(p.project.alloc_mode)}`;
+    $(`${id}-frozen`).style.display = p.project.frozen ? 'inline-block' : 'none';
+
+    const L2 = p.L2, L3 = p.L3;
+    $(`${id}-kpi-done`).querySelector('.v').textContent = `${L2.tasks_done}/${L2.tasks_total}`;
+    $(`${id}-kpi-rate`).querySelector('.v').textContent = (L2.completion_rate * 100).toFixed(0) + '%';
+    $(`${id}-kpi-conf`).querySelector('.v').textContent = L3.conflicts;
+    $(`${id}-kpi-conf`).className = 'kpi ' + (L3.conflicts > 5 ? 'bad' : L3.conflicts > 2 ? 'warn' : '');
+    $(`${id}-kpi-tax`).querySelector('.v').textContent = L3.events_per_min.toFixed(1);
+    $(`${id}-l3-channels`).textContent = L3.channel_count;
+    $(`${id}-l3-idle`).textContent = L3.idle_agents;
+    $(`${id}-l3-redundancy`).textContent = L3.redundancy;
+    const top = Object.entries(L3.performative_mix || {}).sort((a,b) => b[1]-a[1])[0];
+    $(`${id}-l3-perf`).textContent = top ? `${top[0]} ${top[1]}` : '—';
+    const build = L2.build_passes;
+    $(`${id}-l2-build`).textContent = build === true ? '✓' : build === false ? '✗' : '—';
+    $(`${id}-l2-build`).style.color = build === true ? 'var(--good)' : build === false ? 'var(--bad)' : 'var(--text-3)';
+  }
+
+  async function pollMaster() {
+    try {
+      const r = await fetch('/api/eval/master');
+      if (!r.ok) throw new Error('http ' + r.status);
+      const data = await r.json();
+      $('conn-pill').textContent = 'live';
+      $('conn-pill').className = 'conn good';
+      $('last-update').textContent = new Date().toTimeString().slice(0,8);
+      lastFetch = Date.now();
+      let totalEvents = 0;
+      for (const p of data.projects) {
+        updateCard(p);
+        totalEvents += (p.L3?.events_per_min || 0);
+      }
+      $('cohort-events').textContent = totalEvents.toFixed(1) + ' ev/min total';
+      renderLeaderboard(data.projects);
+      // Topology: fetch per-team state in parallel (uses no-auth dev path; tighten in prod).
+      data.projects.forEach((p) => fetchAndRenderTopology(p.project.id));
+    } catch (e) {
+      $('conn-pill').textContent = 'fail';
+      $('conn-pill').className = 'conn bad';
+    }
+  }
+
+  function renderLeaderboard(projects) {
+    const ranked = [...projects].sort((a,b) => {
+      // Score: completion_rate * tasks_done - conflicts * 0.5 + channel_count * 0.1
+      const score = (p) => p.L2.completion_rate * p.L2.tasks_done - p.L3.conflicts * 0.5 + p.L3.channel_count * 0.1;
+      return score(b) - score(a);
+    });
+    const lb = $('leaderboard');
+    lb.innerHTML = `<div class="scoreboard head"><span></span><span>Team / project</span><span>Done</span><span>Conflicts</span><span>Channels</span></div>`;
+    ranked.forEach((p, i) => {
+      const row = document.createElement('div');
+      row.className = 'scoreboard';
+      row.innerHTML = `
+        <span class="rank">#${i+1}</span>
+        <span><a href="/projects/${p.project.id}" style="color:var(--text);text-decoration:none">${p.project.name}</a> <span style="color:var(--text-3);font-family:ui-monospace,monospace;font-size:10.5px">${p.project.id} · Mode ${p.project.alloc_mode}</span></span>
+        <span style="color:${p.L2.tasks_done > 0 ? 'var(--good)' : 'var(--text-3)'}">${p.L2.tasks_done}</span>
+        <span style="color:${p.L3.conflicts > 5 ? 'var(--bad)' : p.L3.conflicts > 2 ? 'var(--warn)' : 'var(--text-3)'}">${p.L3.conflicts}</span>
+        <span>${p.L3.channel_count}</span>`;
+      lb.appendChild(row);
+    });
+  }
+
+  async function fetchAndRenderTopology(projectId) {
+    // Aggregate edges from recent events that reference other agents.
+    // We need a stripped state-like read; use the master endpoint variant of recent events.
+    // For now: fetch /api/p/:proj/state via a synthetic "master" no-auth path won't exist,
+    // so we'll require a per-project read token in URL params (instructor view).
+    // Simpler: skip topology when no token; render a placeholder.
+    const params = new URLSearchParams(location.search);
+    const token = params.get(projectId + '-token') || params.get('token');
+    if (!token) return;
+    try {
+      const r = await fetch(`/api/p/${projectId}/state`, { headers: { Authorization: 'Bearer ' + token } });
+      if (!r.ok) return;
+      const data = await r.json();
+      renderTopology(projectId, data);
+    } catch { /* skip */ }
+  }
+
+  function renderTopology(projectId, data) {
+    const svgEl = $(`${projectId}-svg`);
+    const emptyEl = $(`${projectId}-empty`);
+    if (!svgEl) return;
+
+    // Build node + edge sets from agents + events.
+    const agents = data.agents || [];
+    const events = data.events || [];
+    const nodes = agents.map((a) => ({ id: a.name, role: a.role || '', status: a.status || 'idle' }));
+    if (nodes.length === 0) { emptyEl.style.display = 'grid'; emptyEl.textContent = 'no agents yet'; return; }
+    emptyEl.style.display = 'none';
+    const edgeMap = new Map();
+    for (const ev of events) {
+      if (!ev.agent_name || !ev.refs || !ev.refs.length) continue;
+      for (const ref of ev.refs) {
+        const k = ev.agent_name + '\x00' + ref;
+        edgeMap.set(k, (edgeMap.get(k) ?? 0) + 1);
+      }
+    }
+    const links = [...edgeMap.entries()].map(([k, n]) => {
+      const [a,b] = k.split('\x00');
+      return { source: a, target: b, value: n };
+    }).filter((l) => nodes.find((n) => n.id === l.source) && nodes.find((n) => n.id === l.target));
+
+    const W = svgEl.clientWidth || 320, H = svgEl.clientHeight || 180;
+    const svg = d3.select(svgEl).attr('viewBox', `0 0 ${W} ${H}`);
+    svg.selectAll('*').remove();
+
+    const sim = d3.forceSimulation(nodes)
+      .force('link', d3.forceLink(links).id((d) => d.id).distance(48).strength(0.3))
+      .force('charge', d3.forceManyBody().strength(-90))
+      .force('center', d3.forceCenter(W/2, H/2))
+      .force('collide', d3.forceCollide(14));
+
+    const link = svg.append('g').selectAll('line').data(links).join('line')
+      .attr('class', 'link')
+      .attr('stroke', '#52525b')
+      .attr('stroke-width', (d) => Math.min(Math.sqrt(d.value), 3));
+
+    const node = svg.append('g').selectAll('g').data(nodes).join('g').attr('class', 'node');
+    node.append('circle').attr('r', 8)
+      .attr('fill', (d) => colourFor(d.id))
+      .attr('stroke', (d) => d.status === 'killed' ? '#7f1d1d' : '#27272a');
+    node.append('text').attr('dy', 18).attr('text-anchor', 'middle').text((d) => d.id.length > 12 ? d.id.slice(0,11) + '…' : d.id);
+
+    sim.on('tick', () => {
+      link
+        .attr('x1', (d) => d.source.x).attr('y1', (d) => d.source.y)
+        .attr('x2', (d) => d.target.x).attr('y2', (d) => d.target.y);
+      node.attr('transform', (d) => `translate(${d.x},${d.y})`);
+    });
+    setTimeout(() => sim.stop(), 1500);
+  }
+
+  pollMaster();
+  setInterval(pollMaster, 3000);
+})();
+</script>
+</body>
+</html>

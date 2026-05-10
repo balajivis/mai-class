@@ -1,0 +1,448 @@
+# =============================================================================
+# DocVault Legacy — Code Review
+# =============================================================================
+# Multi-agent review document. Each agent appends findings under their section.
+# Do NOT overwrite other agents' sections — only add/update your own.
+#
+# Structure:
+#   metadata:       review info and status
+#   findings:       keyed by agent name, each with categorized issues
+#   remediation:    prioritized fix plan (maintained by lead reviewer)
+# =============================================================================
+
+metadata:
+  project: docvault-legacy
+  path: docvault-legacy/src
+  language: Java (Spring Boot)
+  reviewed_at: "2026-03-29"
+  status: open            # open | in-progress | resolved
+  severity_counts:
+    critical: 8
+    high: 7
+    medium: 12
+    low: 6
+    info: 5
+
+# -----------------------------------------------------------------------------
+# FINDINGS — each agent adds their own key
+# -----------------------------------------------------------------------------
+findings:
+
+  reviewer-opus:
+    agent: claude-opus-4-6
+    reviewed_at: "2026-03-29T20:40:00Z"
+    scope: full codebase (controllers, services, models, repos, config, tests, SQL)
+
+    critical:
+      - id: SEC-001
+        title: No authentication or authorization on any endpoint
+        files:
+          - controller/AdminController.java
+          - controller/CartController.java
+          - controller/OrderController.java
+          - controller/UserController.java
+        description: >
+          Every endpoint is publicly accessible. Admin operations (product updates,
+          order stats, inventory reports) have zero auth. All endpoints that accept
+          userId as a parameter are IDOR vulnerabilities — any caller can act as
+          any user.
+        status: open
+
+      - id: SEC-002
+        title: Password hash leaked in login and registration responses
+        files:
+          - controller/UserController.java:54
+          - controller/UserController.java:88
+        description: >
+          Login and register endpoints return the full User entity including
+          passwordHash in the JSON response body. The @JsonIgnore on the model
+          may not be effective because the controller wraps the entity in a Map.
+        status: open
+
+      - id: SEC-003
+        title: "PCI-DSS violation: raw credit card data transits the server"
+        files:
+          - controller/OrderController.java:29-31
+          - service/OrderService.java:88-89
+        description: >
+          Card numbers, expiry dates, and CVVs are accepted as plain String
+          parameters and flow through the call stack. Even though payment
+          processing is stubbed, the data touches server memory and could appear
+          in stack traces or logs. Must use tokenization (Stripe Elements, etc.).
+        status: open
+
+      - id: SEC-004
+        title: SQL injection in product search and order search
+        files:
+          - controller/ProductController.java:45
+          - controller/OrderController.java:64
+          - service/OrderService.java:381-402
+        description: >
+          User-supplied search terms reach native SQL queries that are confirmed
+          vulnerable (per inline code comments). searchOrders builds dynamic SQL.
+        status: open
+
+      - id: SEC-005
+        title: H2 console enabled with no profile guard
+        files:
+          - resources/application.properties:19
+        description: >
+          spring.h2.console.enabled=true is set unconditionally. Anyone can
+          access /h2-console and run arbitrary SQL. No Spring profile check.
+        status: open
+
+      - id: SEC-006
+        title: Hardcoded database password in source control
+        files:
+          - resources/application.properties:11
+        description: >
+          password123 committed as spring.datasource.password. Stripe API key
+          and SMTP password placeholders also present.
+        status: open
+
+      - id: SEC-007
+        title: No brute-force protection on login
+        files:
+          - controller/UserController.java:37-65
+          - config/RateLimitFilter.java:26
+        description: >
+          Login endpoint has no rate limiting or account lockout. The RateLimitFilter
+          only covers /api/products/search and /api/products/filter.
+        status: open
+
+      - id: SEC-008
+        title: CORS allows localhost origins with credentials
+        files:
+          - config/WebConfig.java:24
+        description: >
+          allowCredentials(true) with localhost:3000 and localhost:8080 origins.
+          If deployed without overriding cors.allowed-origins, any local dev
+          can make credentialed cross-origin requests.
+        status: open
+
+    high:
+      - id: BUG-001
+        title: Password reset is completely broken
+        files:
+          - controller/UserController.java:140-143
+        description: >
+          Searches by username instead of email (findByUsername(email)).
+          Reset token is generated via UUID.randomUUID() but never stored.
+          The feature can never complete.
+        status: open
+
+      - id: BUG-002
+        title: "Race condition in rate limiter (TOCTOU)"
+        files:
+          - config/RateLimitFilter.java:46-52
+        description: >
+          Window expiry check and count reset are non-atomic. Two threads can
+          both see the window as expired, both reset count to 0, and both
+          increment — exceeding MAX_REQUESTS_PER_MINUTE.
+        status: open
+
+      - id: BUG-003
+        title: "Race condition in addToCart stock check (TOCTOU)"
+        files:
+          - service/OrderService.java:305-335
+        description: >
+          Stock check and decrement are separate operations. Two concurrent
+          requests can both pass the check before either decrements.
+        status: open
+
+      - id: BUG-004
+        title: Payment processed before stock verified in checkout
+        files:
+          - service/OrderService.java:147-171
+        description: >
+          processPayment is called on line 147, then decrementStock on line 170.
+          If stock is insufficient, the RuntimeException rolls back the order
+          but the payment was already "processed". Customer charged, no order.
+        status: open
+
+      - id: BUG-005
+        title: Infinite reward point redemption
+        files:
+          - service/RewardsEngine.java:104-105
+        description: >
+          redeem() never deducts points from the ledger. Users can redeem
+          unlimited $5 discounts.
+        status: open
+
+      - id: BUG-006
+        title: Invoice double-counts tax
+        files:
+          - service/InvoiceGenerator.java:88-91
+        description: >
+          Computes tax on order.getTotalAmount() which already includes tax
+          and shipping from OrderService.processCheckout.
+        status: open
+
+      - id: BUG-007
+        title: BigDecimal compared via doubleValue() — precision loss
+        files:
+          - service/OrderService.java:143
+          - service/OrderService.java:362
+        description: >
+          FREE_SHIPPING_THRESHOLD comparison uses subtotal.doubleValue() >= threshold.
+          Should use BigDecimal.compareTo().
+        status: open
+
+    medium:
+      - id: PERF-001
+        title: Rate limiter leaks memory (never evicts IPs)
+        files:
+          - config/RateLimitFilter.java:17
+        description: >
+          ConcurrentHashMap of rate buckets grows forever. Every unique IP
+          persists indefinitely. DoS vector via IP exhaustion.
+        status: open
+
+      - id: PERF-002
+        title: Product filter loads entire catalog into memory
+        files:
+          - controller/ProductController.java:68
+        description: >
+          /filter calls productRepository.findByIsActiveTrue() then filters
+          in Java via SearchUtil. All active products loaded per request.
+        status: open
+
+      - id: PERF-003
+        title: Admin inventory report loads all products into memory
+        files:
+          - controller/AdminController.java:84-116
+        description: >
+          Aggregation done in Java instead of SQL. Returns every product in
+          the response payload.
+        status: open
+
+      - id: PERF-004
+        title: getOrderStats loads all orders into memory
+        files:
+          - service/OrderService.java:449-466
+        description: >
+          orderRepository.findAll() followed by Java aggregation. Should be
+          database aggregate queries.
+        status: open
+
+      - id: PERF-005
+        title: No pagination on any repository query
+        files:
+          - repository/AuditLogRepository.java
+          - repository/OrderRepository.java
+          - repository/ProductRepository.java
+        description: >
+          All finder methods return unbounded List. No Pageable support anywhere.
+        status: open
+
+      - id: PERF-006
+        title: No database indexes on foreign keys
+        files:
+          - resources/schema.sql
+        description: >
+          cart_items.user_id, orders.user_id, orders.status, order_items.order_id,
+          audit_log.user_id — all missing indexes. Full table scans on every query.
+        status: open
+
+      - id: ARCH-001
+        title: Four inconsistent search implementations
+        files:
+          - service/ProductService.java (native SQL)
+          - util/SearchUtil.java (in-memory streams)
+          - controller/AdminController.java (JPQL)
+          - service/OrderService.java (dynamic native SQL)
+        description: >
+          Each searches different fields, returns different results for the same
+          query. Maintenance nightmare.
+        status: open
+
+      - id: ARCH-002
+        title: Circular dependency between UserService and OrderService
+        files:
+          - service/UserService.java:27-29
+          - service/OrderService.java:59-60
+        description: >
+          Patched with @Lazy. Signals need for architectural refactoring.
+        status: open
+
+      - id: ARCH-003
+        title: Controllers bypass service layer
+        files:
+          - controller/ProductController.java:22-23
+          - controller/AdminController.java:39-43
+          - controller/UserController.java:33-35
+        description: >
+          Direct repository and EntityManager injection in controllers.
+        status: open
+
+      - id: ARCH-004
+        title: No DTOs — entities returned directly to clients
+        files:
+          - controller/OrderController.java:47
+          - controller/UserController.java:54
+          - controller/AdminController.java:48
+        description: >
+          JPA entities serialized to JSON, leaking internal structure, lazy
+          proxies, and sensitive fields (passwordHash, paymentReference).
+        status: open
+
+      - id: ARCH-005
+        title: No input validation anywhere
+        files:
+          - model/*.java
+          - controller/*.java
+        description: >
+          Zero Bean Validation annotations. No @Valid in controllers. No email
+          format, password strength, or quantity constraints.
+        status: open
+
+      - id: ARCH-006
+        title: Email service is a no-op
+        files:
+          - service/EmailService.java:29-36
+        description: >
+          sendEmail() logs and returns true. All notification features silently
+          do nothing. PII logged at INFO level.
+        status: open
+
+    low:
+      - id: DATA-001
+        title: Seed data re-inserted on every restart
+        files:
+          - resources/application.properties:22
+          - resources/data.sql
+        description: >
+          spring.sql.init.mode=always with INSERT statements that have no
+          idempotency guard. Duplicate rows on each startup.
+        status: open
+
+      - id: DATA-002
+        title: String-typed enums (status, role, category)
+        files:
+          - model/Order.java:24
+          - model/User.java:25
+          - model/Product.java:24
+        description: >
+          Free-form VARCHAR with no type safety. Typos silently accepted.
+        status: open
+
+      - id: DATA-003
+        title: No unique constraint on cart_items(user_id, product_id)
+        files:
+          - resources/schema.sql:36
+        description: >
+          Concurrent requests can create duplicate cart items for same user+product.
+        status: open
+
+      - id: DATA-004
+        title: Timestamps use LocalDateTime.now() without timezone
+        files:
+          - model/AuditLog.java:43
+          - model/CartItem.java:34
+          - model/User.java:52
+        description: >
+          JVM default timezone used. Inconsistent in multi-timezone deployments.
+          Should use Instant or explicit UTC.
+        status: open
+
+      - id: DATA-005
+        title: RewardsEngine stores points in-memory HashMap
+        files:
+          - service/RewardsEngine.java:46-47
+        description: >
+          All loyalty data lost on restart. HashMap not thread-safe.
+        status: open
+
+      - id: DATA-006
+        title: CacheConfig has race conditions and is entirely unused
+        files:
+          - config/CacheConfig.java
+        description: >
+          Static mutable state, non-atomic TTL eviction, leaks internal keySet.
+          Every method documented as "Called by: nobody". Dead code.
+        status: open
+
+    info:
+      - id: DEAD-001
+        title: "Dead code: InvoiceGenerator (not a Spring bean)"
+        files:
+          - service/InvoiceGenerator.java
+        status: open
+
+      - id: DEAD-002
+        title: "Dead code: RewardsEngine (never injected or called)"
+        files:
+          - service/RewardsEngine.java
+        status: open
+
+      - id: DEAD-003
+        title: "Dead code: CacheConfig (all methods unused)"
+        files:
+          - config/CacheConfig.java
+        status: open
+
+      - id: DEAD-004
+        title: "Dead code: AppConfig (empty @Configuration class)"
+        files:
+          - config/AppConfig.java
+        status: open
+
+      - id: TEST-001
+        title: Significant test coverage gaps
+        files:
+          - test/java/com/docvault/controller/
+        description: >
+          No tests for OrderController. No test isolation (@Transactional).
+          Seed data coupling. Weak assertions. Known bugs documented in comments
+          but not covered by assertions. Test-ordering bugs from shared mutable
+          state (AdminControllerTest mutates product 1, breaking ProductControllerTest).
+        status: open
+
+# -----------------------------------------------------------------------------
+# REMEDIATION PLAN — prioritized fix order
+# -----------------------------------------------------------------------------
+remediation:
+  status: proposed       # proposed | approved | in-progress | done
+  owner: null            # agent assigned to coordinate fixes
+  phases:
+    - phase: 1
+      title: "Critical security fixes"
+      priority: P0
+      items:
+        - SEC-001  # Add auth
+        - SEC-002  # Stop leaking password hashes
+        - SEC-003  # Remove PCI exposure
+        - SEC-004  # Fix SQL injection
+
+    - phase: 2
+      title: "High-priority bugs and remaining security"
+      priority: P1
+      items:
+        - SEC-005  # Disable H2 console
+        - SEC-006  # Externalize secrets
+        - SEC-007  # Rate-limit login
+        - BUG-001  # Fix password reset
+        - BUG-003  # Fix cart stock race
+        - BUG-004  # Fix checkout payment/stock ordering
+
+    - phase: 3
+      title: "Performance and architecture"
+      priority: P2
+      items:
+        - PERF-001 # Fix rate limiter memory leak
+        - PERF-005 # Add pagination
+        - PERF-006 # Add database indexes
+        - ARCH-001 # Consolidate search
+        - ARCH-004 # Introduce DTOs
+        - ARCH-005 # Add input validation
+
+    - phase: 4
+      title: "Cleanup"
+      priority: P3
+      items:
+        - DEAD-001 # Remove InvoiceGenerator
+        - DEAD-002 # Remove RewardsEngine
+        - DEAD-003 # Remove CacheConfig
+        - DEAD-004 # Remove AppConfig
+        - TEST-001 # Fix test isolation and coverage
+        - DATA-001 # Fix seed data idempotency

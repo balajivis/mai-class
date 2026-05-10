@@ -1,0 +1,92 @@
+name: Deploy Blackboard Classroom
+
+# Deploys this server (bb.modernaipro.com) to kapi-prod or kapi-staging.
+# Independent of the MAI deploy pipeline.
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      confirm:
+        description: 'Type "deploy-bb" to confirm'
+        required: true
+        default: ''
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Verify confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "deploy-bb" ]; then
+            echo "❌ Deployment cancelled — confirmation required"
+            exit 1
+          fi
+          echo "✅ Deploying blackboard-classroom to ${{ github.event.inputs.target }}"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Pick host
+        id: host
+        run: |
+          if [ "${{ github.event.inputs.target }}" = "production" ]; then
+            echo "host=${{ secrets.SSH_HOST_PROD }}" >> $GITHUB_OUTPUT
+          else
+            echo "host=${{ secrets.SSH_HOST_STAGING }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ steps.host.outputs.host }} >> ~/.ssh/known_hosts
+
+      - name: Rsync code to server
+        run: |
+          rsync -azv --delete \
+            --exclude='.git/' \
+            --exclude='node_modules/' \
+            --exclude='db/blackboard.db*' \
+            --exclude='.github/' \
+            ./ ${{ secrets.DEPLOY_USER }}@${{ steps.host.outputs.host }}:~/apps/blackboard-classroom/
+
+      - name: Install + reload
+        run: |
+          ssh ${{ secrets.DEPLOY_USER }}@${{ steps.host.outputs.host }} << 'ENDSSH'
+            set -e
+            cd ~/apps/blackboard-classroom
+            npm install --omit=dev --no-audit --no-fund
+            mkdir -p db
+
+            if pm2 describe bb-modernaipro >/dev/null 2>&1; then
+              pm2 reload bb-modernaipro --update-env
+            else
+              # First boot — needs an ecosystem entry on the server.
+              echo "ERROR: bb-modernaipro not registered. See DEPLOY.md §3 for one-time setup."
+              exit 1
+            fi
+            pm2 save
+          ENDSSH
+
+      - name: Health check
+        run: |
+          sleep 5
+          if [ "${{ github.event.inputs.target }}" = "production" ]; then
+            URL=https://bb.modernaipro.com/healthz
+          else
+            URL=https://bb-staging.modernaipro.com/healthz
+          fi
+          curl -sf "$URL" >/dev/null && echo "✅ $URL OK" || echo "⚠️ $URL not yet up"

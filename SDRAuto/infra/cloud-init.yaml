@@ -1,0 +1,81 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+
+packages:
+  - curl
+  - git
+  - build-essential
+  - nginx
+  - postgresql
+  - postgresql-contrib
+  - redis-server
+  - ufw
+
+runcmd:
+  # Node.js 22 LTS
+  - curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+  - apt-get install -y nodejs
+
+  # PM2
+  - npm install -g pm2
+
+  # Create app directory and log directory
+  - mkdir -p /opt/sdrauto
+  - mkdir -p /var/log/sdrauto
+  - chown -R azureuser:azureuser /opt/sdrauto /var/log/sdrauto
+
+  # Configure PostgreSQL
+  - sudo -u postgres psql -c "CREATE USER sdrauto WITH PASSWORD 'changeme_on_first_login';"
+  - sudo -u postgres psql -c "CREATE DATABASE sdrauto OWNER sdrauto;"
+  - sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE sdrauto TO sdrauto;"
+
+  # Configure Redis to bind localhost only and enable persistence
+  - sed -i 's/^bind .*/bind 127.0.0.1 ::1/' /etc/redis/redis.conf
+  - sed -i 's/^# maxmemory .*/maxmemory 512mb/' /etc/redis/redis.conf
+  - sed -i 's/^# maxmemory-policy .*/maxmemory-policy allkeys-lru/' /etc/redis/redis.conf
+  - systemctl restart redis-server
+  - systemctl enable redis-server
+
+  # Configure PostgreSQL to accept local connections
+  - systemctl restart postgresql
+  - systemctl enable postgresql
+
+  # Firewall
+  - ufw allow 22/tcp
+  - ufw allow 80/tcp
+  - ufw allow 443/tcp
+  - ufw allow 3000/tcp
+  - ufw --force enable
+
+  # Nginx reverse proxy
+  - |
+    cat > /etc/nginx/sites-available/sdrauto <<'EOF'
+    server {
+        listen 80;
+        server_name _;
+
+        location / {
+            proxy_pass http://127.0.0.1:3000;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_cache_bypass $http_upgrade;
+        }
+
+        location /health {
+            proxy_pass http://127.0.0.1:3000/health;
+        }
+    }
+    EOF
+  - ln -sf /etc/nginx/sites-available/sdrauto /etc/nginx/sites-enabled/sdrauto
+  - rm -f /etc/nginx/sites-enabled/default
+  - systemctl restart nginx
+  - systemctl enable nginx
+
+  # PM2 startup
+  - env PATH=$PATH:/usr/bin pm2 startup systemd -u azureuser --hp /home/azureuser

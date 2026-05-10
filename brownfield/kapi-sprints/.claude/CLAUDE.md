@@ -1,0 +1,147 @@
+# CLAUDE.md — Kapi Sprints
+
+This file tells Claude Code how to work with this repository.
+
+## What This Is
+
+A multiagent sprint coordination system for Claude Code teams. Two subsystems: **sprint files** (durable record) and **blackboard** (live state). Three memory tiers: working (directives), episodic (entries), semantic (tasks, backlog, status).
+
+## Sprint Workflow
+
+```
+/prd v2          → Plan sprint (interactive): produces tasks.md + prd.md
+/dev v2          → Implement tasks (TDD): pick next task, write test, implement, verify
+/test v2         → QA gate: build, lint, code review, push check
+/post            → Post to blackboard (finding, decision, blocker, etc.)
+/review          → Rate agent work: approve/reject/edit → appends to decisions.yaml
+/walkthrough v2  → Generate sprint review: narrative of what was built
+```
+
+## Key Directories
+
+```
+kapi/                          ← Live sprint state (project.config.ts opsDir)
+├── snapshot.yaml              ← "Where are we?" — PM-curated status → /dashboard
+├── decisions.yaml             ← "What did we decide?" — ADRs + reviews → /decisions
+├── backlog.md                 ← "What's next?" — ## Inbox / ## Done → /backlog
+├── board.md                   ← "What's happening?" — blockers, findings → /board
+├── lessons.md                 ← "What did we learn?" — append-only log → /lessons
+├── blackboard-live.yaml       ← Agent coordination (managed by server) → /agents
+├── entries/                   ← One file per finding/decision/milestone (frontmatter + body)
+├── sprints/{version}/         ← Active sprint tasks.md + prd.md → /sprints/v1
+└── agents/                    ← Agent profile .md files (auto-created)
+
+docs/                          ← Documentation (see docs/README.md)
+├── concepts/                  ← 16 pillars, vision, blackboard, HITL, backwards build
+├── design/                    ← Architecture, launch strategy, onboarding
+└── history/                   ← Archived sprint records (v1, v2)
+
+app/                           ← Next.js 16 dashboard
+├── dashboard/                 ← 5-card command center (reads snapshot + decisions + board)
+├── agents/                    ← Live agent cards, directive kanban
+├── decisions/                 ← ADR + review cards from decisions.yaml
+├── lessons/                   ← Append-only learnings from lessons.md
+├── sprints/[version]/         ← Sprint detail: progress bar, task blocks, PRD
+├── backlog/                   ← Inbox items
+├── board/                     ← Blackboard view
+├── _components/sidebar.tsx    ← Unified sidebar (shared across all pages)
+└── docs/                      ← Markdown + Mermaid viewer
+project.config.ts              ← Project name, initials, opsDir path
+```
+
+## Blackboard Posting
+
+**Never write raw markdown to `board.md` directly.** Use `/post` from the terminal — Claude Code handles classification, entry file creation, and board.md update.
+
+```bash
+/post finding "parser ignores entries with no title"
+/post blocker "need PM sign-off on queue layout"
+/post decision "SQLite vs Postgres for local dev?"
+/post available "Dev ready for v2 T03"
+/post handoff "Test — Dev done with T07, needs e2e coverage"
+/post queue "add stale signal detection to right panel"
+```
+
+This applies to **both humans and agents**. Agents invoke `/post` programmatically during `/dev`, `/test`, etc. Humans type it in the terminal. Same protocol, same format, same entry files.
+
+Entry files land in `kapi/entries/` with frontmatter:
+```yaml
+---
+type: finding | decision | blocker | steer | available | handoff | queued
+role: Human:Balaji | Dev | PM | Test
+timestamp: feb 24 10am
+title: Short title
+---
+```
+
+## Task Format
+
+```markdown
+- [ ] **T01: Task title** (S)
+  What: What it does
+  Files: path/to/file.ts
+  Logic:
+    key implementation detail
+  Test: How to verify
+```
+
+Sizes: S = ~15 min, M = ~30 min
+
+## Design Principles
+
+1. **Backwards Build** — Start from done, work backwards. Every intermediate state is deployable.
+2. **Blackboard** — Single source of truth for sprint state. If it matters, it goes on the board.
+3. **TDD** — Test first, always. No task done without a passing test.
+4. **Small sprints** — 3 hours max. If it takes longer, the planning was wrong.
+5. **No clever code** — Boring, obvious, well-named code wins.
+
+## Live Blackboard Channel
+
+The repo includes a blackboard server + MCP shim in `blackboard/`. These enable real-time multi-agent coordination via Claude Code channels.
+
+### How it connects
+
+- **`.mcp.json`** at repo root configures `blackboard-channel` pointing to `blackboard/shim.ts`
+- The shim auto-starts `blackboard/server.ts` on port 8790 and the Next.js dashboard on port 8791 if not already running
+- Every Claude Code session gets `read_blackboard` and `write_to_blackboard` tools
+- Writes broadcast to ALL connected agents via `<channel>` notifications
+
+### Agent protocol
+
+On startup:
+1. `read_blackboard` to see current state
+2. `write_to_blackboard` to register under `agents.<your_name>` with role, status, capabilities
+3. Check `directives:` for assigned work
+
+On `<channel>` notification:
+1. `read_blackboard` to see what changed
+2. Check directives for tasks assigned to you
+3. Do the work
+4. `write_to_blackboard` to update your status and log results
+
+Rules:
+- Only write to your own section under `agents.<your_name>`
+- Never modify another agent's section
+- Always add a `log_entry` when writing
+- Read before writing to avoid stale state
+
+### Global install (optional)
+
+To use the blackboard from any project directory:
+
+```bash
+claude mcp add --scope user blackboard-channel -- bun /path/to/kapi-sprints/blackboard/shim.ts
+```
+
+### Dashboard
+
+The Next.js dashboard at `localhost:8791` connects via WebSocket (`ws://localhost:8790/ws`) for live updates. The status bar shows connection state — green "live" when connected, gray "polling" when falling back to SSR.
+
+## Development
+
+```bash
+npm run dev    # localhost:8791 (port 8791 to avoid conflicts)
+npm run build  # must pass before every push
+```
+
+Note: The shim auto-starts both the blackboard server (:8790) and the dashboard (:8791) when Claude Code launches. You rarely need to run `npm run dev` manually.

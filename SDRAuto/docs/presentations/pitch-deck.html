@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Autonomous BDR</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --border: #2a2d3a;
+    --text: #e4e4e7;
+    --text-muted: #9ca3af;
+    --accent: #6366f1;
+    --accent-light: #818cf8;
+    --accent-glow: rgba(99, 102, 241, 0.15);
+    --green: #34d399;
+    --orange: #fb923c;
+    --red: #f87171;
+    --yellow: #fbbf24;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .deck {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6vh 8vw;
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+    pointer-events: none;
+    overflow-y: auto;
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  .slide.exit-left {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+
+  .tag-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+  .tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--accent-glow);
+    color: var(--accent-light);
+    border: 1px solid rgba(99,102,241,0.25);
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #fff 0%, var(--accent-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #fff;
+  }
+
+  .subtitle {
+    font-size: clamp(1rem, 1.8vw, 1.35rem);
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 52ch;
+    margin-bottom: 2rem;
+  }
+
+  .callout {
+    background: var(--accent-glow);
+    border-left: 3px solid var(--accent);
+    padding: 1rem 1.25rem;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-top: 1.5rem;
+    max-width: 70ch;
+  }
+  .callout strong { color: var(--text); }
+
+  /* Stats grid */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+  .stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--accent-light);
+  }
+  .stat-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    margin-top: 0.25rem;
+  }
+  .stat-context {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    line-height: 1.5;
+  }
+
+  /* Steps */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .step-title { font-weight: 600; color: #fff; }
+  .step-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+
+  /* Columns */
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin: 1.5rem 0;
+  }
+  .col-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent-light);
+    margin-bottom: 0.75rem;
+  }
+
+  /* List items */
+  .item {
+    margin-bottom: 1rem;
+  }
+  .item-title {
+    font-weight: 600;
+    color: #fff;
+    font-size: 0.95rem;
+  }
+  .item-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+    margin-top: 0.2rem;
+  }
+
+  /* Table */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 1.5rem 0;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+    color: var(--accent-light);
+    border-bottom: 2px solid var(--border);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  td {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+  tr:last-child td { border-bottom: none; }
+  td:first-child { color: #fff; font-weight: 500; }
+
+  .feasibility-bar {
+    display: inline-block;
+    height: 6px;
+    border-radius: 3px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  /* Diff badges */
+  .badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  .badge-easy { background: rgba(52,211,153,0.15); color: var(--green); }
+  .badge-medium { background: rgba(251,191,36,0.15); color: var(--yellow); }
+  .badge-hard { background: rgba(248,113,113,0.15); color: var(--red); }
+
+  /* Numbered list */
+  .diff-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .diff-item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  .diff-num {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.8rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Autonomy levels */
+  .level-row {
+    display: grid;
+    grid-template-columns: 60px 1fr 180px;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+  }
+  .level-row.recommended {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+  }
+  .level-badge {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--accent-light);
+  }
+  .level-label { font-weight: 600; color: #fff; font-size: 0.95rem; }
+  .level-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem; }
+  .level-meta {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+  }
+  .risk-badge, .value-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+
+  /* Phases */
+  .phases {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+  }
+  .phase-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+  }
+  .phase-card::before {
+    content: attr(data-phase);
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent-light);
+    position: absolute;
+    top: -0.6rem;
+    left: 1rem;
+    background: var(--bg);
+    padding: 0 0.5rem;
+  }
+  .phase-time {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent-light);
+    margin-bottom: 0.5rem;
+  }
+  .phase-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* Navigation */
+  .nav {
+    position: fixed;
+    bottom: 2rem;
+    right: 3rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 100;
+  }
+  .nav button {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav button:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), #a78bfa);
+    transition: width 0.4s ease;
+    z-index: 100;
+  }
+
+  .slide-counter {
+    position: fixed;
+    bottom: 2.3rem;
+    left: 3rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    z-index: 100;
+  }
+
+  /* Risk/pitfall markers */
+  .risk-high { border-left: 3px solid var(--red); }
+  .risk-watch { border-left: 3px solid var(--orange); }
+
+  @media (max-width: 768px) {
+    .slide { padding: 4vh 5vw; }
+    .cols { grid-template-columns: 1fr; }
+    .phases { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr; }
+    .level-row { grid-template-columns: 50px 1fr; }
+    .level-meta { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="slide-counter" id="counter"></div>
+
+<div class="deck" id="deck">
+
+  <!-- Slide 1: Title -->
+  <div class="slide active" data-slide="0">
+    <div class="tag-bar">
+      <span class="tag">Concept Brief</span>
+      <span class="tag">Lead Sourcing</span>
+      <span class="tag">Style Cloning</span>
+      <span class="tag">Reply Handling</span>
+      <span class="tag">Meeting Booking</span>
+    </div>
+    <h1>The Autonomous BDR</h1>
+    <p class="subtitle">An AI agent that sources leads, personalises outreach, handles replies, and books meetings &mdash; with human review gates.</p>
+  </div>
+
+  <!-- Slide 2: Why Now -->
+  <div class="slide" data-slide="1">
+    <h2>Why Now</h2>
+    <p class="subtitle">The window is open</p>
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-value">70%</div>
+        <div class="stat-label">of SDR time</div>
+        <div class="stat-context">Spent on non-selling tasks: research, logging, sequencing</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">5&times;</div>
+        <div class="stat-label">higher convert rate</div>
+        <div class="stat-context">When outreach is triggered by a live buying signal vs. cold list</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">0</div>
+        <div class="stat-label">SDR hires needed</div>
+        <div class="stat-context">For an early-stage startup to test GTM fit with an autonomous agent</div>
+      </div>
+    </div>
+    <div class="callout">
+      <strong>Key insight:</strong> LLMs can now extract rep voice from 30&ndash;50 emails and replicate it at scale &mdash; that was impossible 18 months ago. This is the enabling technology.
+    </div>
+  </div>
+
+  <!-- Slide 3: What It Does -->
+  <div class="slide" data-slide="2">
+    <h2>What It Does</h2>
+    <p class="subtitle">Core loop: 5 stages</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-title">Source</div>
+          <div class="step-desc">Monitors job boards, funding signals, LinkedIn, and tech-stack data to find in-market accounts matching your ICP</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-title">Research</div>
+          <div class="step-desc">Builds a per-account brief: org chart signals, recent news, pain indicators, and a persona read on the buyer</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-title">Outreach</div>
+          <div class="step-desc">Writes and sends personalised first touches in the rep's cloned voice across email and LinkedIn, with timing intelligence</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <div class="step-title">Reply</div>
+          <div class="step-desc">Classifies inbound replies: interest, objection, unsubscribe. Handles or escalates based on configured autonomy level</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div>
+          <div class="step-title">Book</div>
+          <div class="step-desc">Proposes calendar slots, handles rescheduling, logs the booked meeting to CRM with full conversation context</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 4: Key Design Decisions -->
+  <div class="slide" data-slide="3">
+    <h2>Key Design Decisions</h2>
+    <p class="subtitle">The choices that define the product</p>
+    <div class="cols">
+      <div>
+        <div class="col-title">Foundational</div>
+        <div class="item">
+          <div class="item-title">Human-in-the-loop design</div>
+          <div class="item-desc">Approve every message &rarr; approve first touch only &rarr; fully autonomous. The default must be opinionated.</div>
+        </div>
+        <div class="item">
+          <div class="item-title">Sender identity & deliverability</div>
+          <div class="item-desc">Real rep alias or branded persona? Domain warmup, SPF/DKIM, and daily caps designed in on day one.</div>
+        </div>
+        <div class="item">
+          <div class="item-title">Stateful memory across touches</div>
+          <div class="item-desc">Agent remembers what it sent, what was replied, and what was rejected &mdash; across all channels &mdash; without any rep logging.</div>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Strategic</div>
+        <div class="item">
+          <div class="item-title">Lead sourcing vs. BYOL</div>
+          <div class="item-desc">Build-in lead finding (stronger moat, harder) vs. bring-your-own-list (faster to ship). Most start BYOL.</div>
+        </div>
+        <div class="item">
+          <div class="item-title">Personalisation depth vs. scale</div>
+          <div class="item-desc">Deep per-account research vs. high-volume templated sends are different products. Doing both dilutes both.</div>
+        </div>
+        <div class="item">
+          <div class="item-title">Channel scope</div>
+          <div class="item-desc">Email only is safest to start. Each additional channel multiplies state machine complexity significantly.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 5: Style Cloning Feasibility -->
+  <div class="slide" data-slide="4">
+    <h2>Style Cloning Feasibility</h2>
+    <p class="subtitle">What's actually clonable &mdash; and what isn't</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Capability</th><th>Data Needed</th><th>Feasibility</th><th>Difficulty</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Voice & tone</td><td>~30&ndash;50 sent emails</td>
+            <td><span class="feasibility-bar" style="width:88px;background:var(--green)"></span>88%</td>
+            <td><span class="badge badge-easy">Easy</span></td>
+          </tr>
+          <tr>
+            <td>Subject line patterns</td><td>~20 sent emails</td>
+            <td><span class="feasibility-bar" style="width:85px;background:var(--green)"></span>85%</td>
+            <td><span class="badge badge-easy">Easy</span></td>
+          </tr>
+          <tr>
+            <td>Sign-off & formatting</td><td>~10 sent emails</td>
+            <td><span class="feasibility-bar" style="width:92px;background:var(--green)"></span>92%</td>
+            <td><span class="badge badge-easy">Easy</span></td>
+          </tr>
+          <tr>
+            <td>Cadence & follow-up timing</td><td>Emails + CRM timestamps</td>
+            <td><span class="feasibility-bar" style="width:65px;background:var(--yellow)"></span>65%</td>
+            <td><span class="badge badge-medium">Medium</span></td>
+          </tr>
+          <tr>
+            <td>Value prop emphasis</td><td>Emails + win/loss data</td>
+            <td><span class="feasibility-bar" style="width:58px;background:var(--yellow)"></span>58%</td>
+            <td><span class="badge badge-medium">Medium</span></td>
+          </tr>
+          <tr>
+            <td>Objection handling style</td><td>Reply threads + call transcripts</td>
+            <td><span class="feasibility-bar" style="width:50px;background:var(--yellow)"></span>50%</td>
+            <td><span class="badge badge-medium">Medium</span></td>
+          </tr>
+          <tr>
+            <td>When to push vs. ease off</td><td>Requires outcome labels</td>
+            <td><span class="feasibility-bar" style="width:28px;background:var(--red)"></span>28%</td>
+            <td><span class="badge badge-hard">Hard</span></td>
+          </tr>
+          <tr>
+            <td>Relationship reading</td><td>Likely not learnable</td>
+            <td><span class="feasibility-bar" style="width:14px;background:var(--red)"></span>14%</td>
+            <td><span class="badge badge-hard">Hard</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <strong>Key insight:</strong> Surface style is clonable on day one with ~50 emails. Deep sales judgment requires outcome data at scale &mdash; and some of it may never be learnable from text alone.
+    </div>
+  </div>
+
+  <!-- Slide 6: Pitfalls -->
+  <div class="slide" data-slide="5">
+    <h2>Pitfalls</h2>
+    <p class="subtitle">Where autonomous BDRs fail</p>
+    <div class="cols">
+      <div>
+        <div class="col-title">High Risk</div>
+        <div class="item risk-high" style="padding-left:0.75rem">
+          <div class="item-title">Spam at scale</div>
+          <div class="item-desc">A misconfigured agent can burn a domain in days. Daily caps, bounce monitoring, and auto-pause must be bulletproof.</div>
+        </div>
+        <div class="item risk-high" style="padding-left:0.75rem">
+          <div class="item-title">The "obviously AI" problem</div>
+          <div class="item-desc">Prospects increasingly detect AI-written email. Quality must clear a human-written bar.</div>
+        </div>
+        <div class="item risk-high" style="padding-left:0.75rem">
+          <div class="item-title">Regulatory exposure</div>
+          <div class="item-desc">GDPR, CAN-SPAM, CCPA all constrain automated outreach. Operating across regions without consent management is a compliance time bomb.</div>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Watch Out</div>
+        <div class="item risk-watch" style="padding-left:0.75rem">
+          <div class="item-title">Rep adoption failure</div>
+          <div class="item-desc">Reps who can't see what the agent is doing will route around it. A glass-box UI is non-negotiable.</div>
+        </div>
+        <div class="item risk-watch" style="padding-left:0.75rem">
+          <div class="item-title">Runaway reply handling</div>
+          <div class="item-desc">An "unsubscribe" reply that triggers a follow-up is a brand disaster. Reply classification is harder than it looks.</div>
+        </div>
+        <div class="item risk-watch" style="padding-left:0.75rem">
+          <div class="item-title">Attribution ambiguity</div>
+          <div class="item-desc">Without clear attribution, customers can't justify spend and you can't improve the product. Build it in from day one.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 7: 10x Differentiators -->
+  <div class="slide" data-slide="6">
+    <h2>10&times; Differentiators</h2>
+    <p class="subtitle">What makes this 10&times; better than existing tools</p>
+    <div class="diff-list">
+      <div class="diff-item">
+        <div class="diff-num">1</div>
+        <div>
+          <div class="item-title">Learns your best rep</div>
+          <div class="item-desc">Studies top rep's sent emails and call recordings, extracts their voice and patterns, writes in their style &mdash; not generic templates.</div>
+        </div>
+      </div>
+      <div class="diff-item">
+        <div class="diff-num">2</div>
+        <div>
+          <div class="item-title">Real-time signal response</div>
+          <div class="item-desc">Prospect just got funded? Opened 3 times? Agent responds in minutes, not on the next scheduled cadence day.</div>
+        </div>
+      </div>
+      <div class="diff-item">
+        <div class="diff-num">3</div>
+        <div>
+          <div class="item-title">Self-improving via outcomes</div>
+          <div class="item-desc">Tracks which messages, subject lines, and send times produce replies, then systematically improves over 30/60/90 days.</div>
+        </div>
+      </div>
+      <div class="diff-item">
+        <div class="diff-num">4</div>
+        <div>
+          <div class="item-title">Intelligent reply handling</div>
+          <div class="item-desc">When a prospect replies "we use X already," the agent rebuttals with a specific, context-aware response before escalating.</div>
+        </div>
+      </div>
+      <div class="diff-item">
+        <div class="diff-num">5</div>
+        <div>
+          <div class="item-title">CEO mode for small teams</div>
+          <div class="item-desc">Founder sets ICP + value prop once. Agent runs outbound indefinitely with a weekly digest. Zero SDR hire needed.</div>
+        </div>
+      </div>
+      <div class="diff-item">
+        <div class="diff-num">6</div>
+        <div>
+          <div class="item-title">Transparent reasoning log</div>
+          <div class="item-desc">Every action has a visible rationale: the signal it saw, the rule it applied, the message it chose. Builds trust.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 8: Autonomy Spectrum -->
+  <div class="slide" data-slide="7">
+    <h2>Autonomy Spectrum</h2>
+    <p class="subtitle">Choose your control level</p>
+    <div style="margin:1.5rem 0">
+      <div class="level-row">
+        <div class="level-badge">L1</div>
+        <div>
+          <div class="level-label">Approve everything</div>
+          <div class="level-desc">Agent drafts; human sends every message. Best for compliance-sensitive teams.</div>
+        </div>
+        <div class="level-meta">
+          <span class="risk-badge" style="background:rgba(52,211,153,0.15);color:var(--green)">Low risk</span>
+          <span class="value-badge" style="background:rgba(156,163,175,0.15);color:var(--text-muted)">Low value</span>
+        </div>
+      </div>
+      <div class="level-row recommended">
+        <div class="level-badge">L2</div>
+        <div>
+          <div class="level-label">First touch approval <span style="font-size:0.7rem;background:var(--accent);color:#fff;padding:2px 6px;border-radius:4px;margin-left:6px">RECOMMENDED</span></div>
+          <div class="level-desc">Auto-follow-up; human approves only first contact. Best for most enterprise SDR teams.</div>
+        </div>
+        <div class="level-meta">
+          <span class="risk-badge" style="background:rgba(251,191,36,0.15);color:var(--yellow)">Low-Med</span>
+          <span class="value-badge" style="background:rgba(99,102,241,0.15);color:var(--accent-light)">Med value</span>
+        </div>
+      </div>
+      <div class="level-row">
+        <div class="level-badge">L3</div>
+        <div>
+          <div class="level-label">Auto-send, review replies</div>
+          <div class="level-desc">All outreach automated; human handles replies only. Best for growth-stage scale-ups.</div>
+        </div>
+        <div class="level-meta">
+          <span class="risk-badge" style="background:rgba(251,191,36,0.15);color:var(--yellow)">Med risk</span>
+          <span class="value-badge" style="background:rgba(99,102,241,0.15);color:var(--accent-light)">High value</span>
+        </div>
+      </div>
+      <div class="level-row">
+        <div class="level-badge">L4</div>
+        <div>
+          <div class="level-label">Fully autonomous</div>
+          <div class="level-desc">Agent handles sourcing, outreach, replies, booking end-to-end. Best for founders / early-stage.</div>
+        </div>
+        <div class="level-meta">
+          <span class="risk-badge" style="background:rgba(248,113,113,0.15);color:var(--red)">High risk</span>
+          <span class="value-badge" style="background:rgba(52,211,153,0.15);color:var(--green)">Highest</span>
+        </div>
+      </div>
+    </div>
+    <div class="callout">
+      <strong>Recommended default: L2.</strong> Safe enough to launch, autonomous enough to save real time.
+    </div>
+  </div>
+
+  <!-- Slide 9: Build Path -->
+  <div class="slide" data-slide="8">
+    <h2>Recommended Build Path</h2>
+    <p class="subtitle">Start narrow. Prove value fast. Expand with confidence.</p>
+    <div class="phases">
+      <div class="phase-card" data-phase="Phase 1">
+        <div class="phase-time">Weeks 1&ndash;4</div>
+        <div class="phase-text">Email-only, BYOL, L2 autonomy. Use ~50 emails to clone rep style. Approve first touch, auto-follow-up. Prove reply rates before adding complexity.</div>
+      </div>
+      <div class="phase-card" data-phase="Phase 2">
+        <div class="phase-time">Months 2&ndash;3</div>
+        <div class="phase-text">Add signal-based lead sourcing. Layer in intent signals (funding, hiring, job changes). Introduce real-time trigger outreach as a distinct flow.</div>
+      </div>
+      <div class="phase-card" data-phase="Phase 3">
+        <div class="phase-time">Months 4&ndash;6</div>
+        <div class="phase-text">Expand channels + raise autonomy. Add LinkedIn. Move toward L3/L4 as trust is built. Ship the transparent reasoning log and self-improvement loop.</div>
+      </div>
+    </div>
+    <div class="callout">
+      <strong>Open question:</strong> Are you targeting founders doing their own outbound, or SDR teams at scale-ups? This shapes almost every decision above.
+    </div>
+  </div>
+
+</div>
+
+<div class="nav">
+  <button id="prev" aria-label="Previous slide">&#8592;</button>
+  <button id="next" aria-label="Next slide">&#8594;</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  const progress = document.getElementById('progress');
+  const counter = document.getElementById('counter');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+
+  function update(direction) {
+    slides.forEach((s, i) => {
+      s.classList.remove('active', 'exit-left');
+      if (i < current) s.classList.add('exit-left');
+    });
+    slides[current].classList.add('active');
+    progress.style.width = ((current + 1) / total * 100) + '%';
+    counter.textContent = (current + 1) + ' / ' + total;
+  }
+
+  function go(n) {
+    if (n < 0 || n >= total) return;
+    current = n;
+    update();
+  }
+
+  prevBtn.addEventListener('click', () => go(current - 1));
+  nextBtn.addEventListener('click', () => go(current + 1));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(current + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(current - 1); }
+  });
+
+  // Touch support
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+  document.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) { dx < 0 ? go(current + 1) : go(current - 1); }
+  });
+
+  update();
+</script>
+
+</body>
+</html>
