@@ -8,8 +8,8 @@ The full pedagogical vision lives in [`PROJECT.md`](./PROJECT.md). Read that fir
 
 | Folder | Role in the class |
 |---|---|
-| [`gstack-practice/`](./gstack-practice/) | Garry Tan's gstack — structured single-agent workflow (Plan → Build → Review → Ship). Used in **Block A** to anchor what students already know. |
-| [`multiagent-primer/`](./multiagent-primer/) | Three short labs (blackboard, task allocation, team design) that make students *feel* coordination primitives. **Block B** — the core curriculum. See its [`PROJECT.md`](./PROJECT.md). |
+| [`gstack-practice/`](./gstack-practice/) | Garry Tan's gstack — structured single-agent workflow (Plan → Build → Review → Ship). The *toolkit* used by Lab 0. |
+| [`multiagent-primer/`](./multiagent-primer/) | Four short labs that make students *feel* coordination primitives: Lab 0 (single-agent rhythm via gstack), Lab 1 (blackboard), Lab 2 (task allocation), Lab 3 (team design). **Blocks A + B** — the core curriculum. See its [`PROJECT.md`](./PROJECT.md). |
 | [`openclaw/`](./openclaw/) | Self-hosted agent gateway — connect a Claude/Groq agent to Telegram, WhatsApp, Discord. **Block D** — agents on real channels. |
 | [`brownfield/`](./brownfield/) | Legacy DocVault Java app + a sprints dashboard + a working `board.md`. **Block E capstone** — multi-agent triage on code students didn't write. |
 | [`SDRAuto/`](./SDRAuto/) | A real autonomous-BDR product (read-only reference). **Block F** — what production single-agent systems actually look like. |
@@ -18,11 +18,13 @@ The full pedagogical vision lives in [`PROJECT.md`](./PROJECT.md). Read that fir
 
 ## Class arc (1 day)
 
-1. **Block A — Structured single-agent workflow** (gstack-practice) — 45 min
-2. **Block B — Feel the primitives** (multiagent-primer Labs 1-3) — 90 min
-3. **Block D — Real channel, real human** (openclaw) — 45 min
-4. **Block E — Brownfield triage capstone** (brownfield) — 2 hr
-5. **Block F — Production walk** (SDRAuto) — 30 min
+1. **Block A — Single-agent workflow rhythm** (`multiagent-primer/lab0-workflow/`, runs gstack) — 45 min
+2. **Block B — Feel the primitives** (`multiagent-primer/` Labs 1-3) — 90 min
+3. **Block D — Real channel, real human** (`openclaw/`) — 45 min
+4. **Block E — Brownfield triage capstone** (`brownfield/`) — 2 hr
+5. **Block F — Production walk** (`SDRAuto/`) — 30 min
+
+The four primer labs (0 → 1 → 2 → 3) are designed to be done in sequence — Lab 0 establishes the single-agent baseline, then Lab 1 reveals the coordination problem, then 2 and 3 patch it.
 
 ## Prerequisites for students
 

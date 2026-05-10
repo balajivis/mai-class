@@ -45,11 +45,25 @@ Multi-agent education is overrun with framework demos (LangGraph, CrewAI, AutoGe
 
 Our counter-bet: have students **feel** the primitives — staleness, races, duplication, bottlenecks, the coordination tax — using the simplest possible apparatus (markdown files + multiple Claude Code sessions). Once they've felt the pain in 25 minutes of free-for-all, the patterns make sense; the frameworks become *recognisable as packaging*.
 
-Concretely: **no framework code in the labs.** A LangGraph comparison is a take-home bonus *after* the labs, never inside them.
+### Note on frameworks (revised 2026-05-09)
+
+The original directive was **no framework code in the labs.** That has been narrowed: it now applies specifically to **multi-agent coordination frameworks** (LangGraph, CrewAI, AutoGen) — anything that hides the primitives Labs 1-3 are designed to make students feel.
+
+**Single-agent workflow toolkits are allowed**, and Lab 0 uses one (gstack). Reasoning: a single-agent workflow library is not a multi-agent coordination framework — it has no shared state, no task allocation, no topology. It packages role-prompts and a sprint rhythm for one agent. Showing students this *first* establishes the baseline ("one agent + good roles ships real work") that makes Lab 1's coordination crisis land. Without it, students who already use Cursor/Claude Code daily will dismiss Lab 1 as a contrived problem.
+
+A LangGraph comparison remains a take-home bonus *after* the labs — that one is genuinely a coordination framework and would short-circuit the lesson.
 
 ---
 
-## The three labs
+## The labs
+
+### Lab 0 — `lab0-workflow/` ✅ BUILT (bridge to gstack)
+- **Time:** 45 min (10 setup · 30 work · 5 reflect)
+- **Topology:** 1 agent, structured workflow
+- **Apparatus:** [`gstack`](../gstack-practice/gstack/) — single-agent slash-command toolkit (Plan → Review → Build → Ship → Retro)
+- **Task:** run one tiny feature/fix end-to-end through the gstack sprint loop on a small sandbox repo
+- **Lesson it sets up:** §2 Agent Anatomy and the inversion that lands in Lab 1 — students feel the *single-agent ceiling* before they meet the *coordination problem*
+- **Pain it teaches:** none directly — the absence of pain is the point. This lab makes Lab 1's pain legible.
 
 ### Lab 1 — `lab1-blackboard/` ✅ BUILT
 - **Time:** 25 min (5 setup · 15 work · 5 reflect)
@@ -115,6 +129,7 @@ This framework is the spine of the course. Every lab and every design choice in 
 
 | Lab | Pillars covered (directly) | Pillars introduced (implicitly) |
 |---|---|---|
+| Lab 0 — Workflow rhythm | — (sets the baseline; covers no pillar) | 7 (BDI made tangible at the single-agent level), 16 (frameworks as packaging) |
 | Lab 1 — Blackboard | 1, 4 | 5, 6 (felt as pain, not solved) |
 | Lab 2 — Task allocation | 2 | 6, 12 (negotiation and trust become obvious gaps) |
 | Lab 3 — Team design | 3 | 7, 15 (BDI drift, coordination eval) |
@@ -137,6 +152,7 @@ After all three labs + big exercise, students have **personally implemented** ~7
 
 | Component | State |
 |---|---|
+| `lab0-workflow/` | ✅ Built 2026-05-09 (bridge README pointing at `../gstack-practice/`) |
 | `lab1-blackboard/` | ✅ Built and smoke-tested 2026-05-09 |
 | `lab2-task-allocation/` | ⏳ Designed, not built. Needs `CLAUDE.md` + `task-cli/` (~60 LOC Node) |
 | `lab3-team-design/` | ⏳ Designed, not built. Three `CLAUDE.md` variants for three topologies |
