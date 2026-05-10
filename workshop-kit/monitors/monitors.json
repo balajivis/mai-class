@@ -1,9 +1,0 @@
-{
-  "monitors": [
-    {
-      "name": "blackboard-watch",
-      "description": "Stream team blackboard events targeted at this agent (task offers, escalations, claims). Each event arrives as a notification.",
-      "command": "${CLAUDE_PLUGIN_ROOT}/bin/monitor-stream.sh"
-    }
-  ]
-}
