@@ -38,6 +38,17 @@ Your team's goal: complete the 8-task sprint backlog described in `tasks.json`. 
 - **One claim at a time.** Don't multi-claim. Finish the one in your hand, then claim the next.
 - **Stop when no claimable task remains.** Reply to your human "done — see outputs/" and exit.
 
+## Memory — your personal learnings file
+
+You have a private memory file at `memory/agent-N.md` (where N is your slot). Use it like this:
+
+1. **Read it at every task start.** Before claiming, read your file *and* siblings' files. If something there applies to the task you're about to do, reference it inline in your output.
+2. **Append a learning at every task done — only if non-obvious.** If you discovered something a future agent (or future you) would benefit from knowing, append one entry using the format already shown at the top of the file. If the task taught you nothing surprising, skip — don't pad.
+3. **Append-only. Never edit your own past entries or anyone else's.** A wrong learning gets a new entry that supersedes it; the old one stays as history.
+4. **Cite the source.** Every claim points back to a task ID, file path, or observation. No source = don't write it.
+
+This is how teams that run for more than one sprint avoid repeating yesterday's mistakes.
+
 ---
 
 ## What you will notice (and what to tell the human afterwards)
