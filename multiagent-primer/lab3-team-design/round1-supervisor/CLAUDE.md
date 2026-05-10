@@ -9,10 +9,17 @@ Read `blackboard.md`'s `## Roster` section.
 - If only agent-1 is registered, you are **agent-2 (worker)**.
 - If agent-1 and agent-2 are registered, you are **agent-3 (worker)**.
 
-Append your line:
+Append your line — exact format, **role must be one of `supervisor`, `worker-a`, `worker-b`**:
 
 ```bash
-printf -- '- %s · joined %s · %s\n' "agent-N" "$(date -u +%FT%TZ)" "<role>" >> blackboard.md
+# agent-1 (first in):
+printf -- '- agent-1 · joined %s · supervisor\n' "$(date -u +%FT%TZ)" >> blackboard.md
+
+# agent-2 (second in):
+printf -- '- agent-2 · joined %s · worker-a\n' "$(date -u +%FT%TZ)" >> blackboard.md
+
+# agent-3 (third in):
+printf -- '- agent-3 · joined %s · worker-b\n' "$(date -u +%FT%TZ)" >> blackboard.md
 ```
 
 ## Step 2 — Act according to your role

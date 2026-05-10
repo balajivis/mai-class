@@ -15,9 +15,18 @@ cd "$(dirname "$0")"
 
 ROUND="${1:-}"
 case "$ROUND" in
-  1|sup|supervisor) DIR=round1-supervisor; LABEL='Round 1 · Supervisor' ;;
-  2|pipe|pipeline)  DIR=round2-pipeline;   LABEL='Round 2 · Pipeline'   ;;
-  3|swarm)          DIR=round3-swarm;      LABEL='Round 3 · Swarm'      ;;
+  1|sup|supervisor)
+    DIR=round1-supervisor; LABEL='Round 1 · Supervisor'; ROUND_NUM=1
+    KICKOFF='You are in the SUPERVISOR round. Read CLAUDE.md and task.md. Register on the roster — first agent in is the supervisor (assigns directives, integrates), second and third are workers (wait for directives). Then act on your role.'
+    ;;
+  2|pipe|pipeline)
+    DIR=round2-pipeline; LABEL='Round 2 · Pipeline'; ROUND_NUM=2
+    KICKOFF='You are in the PIPELINE round. Read CLAUDE.md and task.md. Register on the roster — agent-1 owns Transport, agent-2 owns Lodging, agent-3 owns Activities. Each stage WAITS for the previous stage to post its DONE marker before starting. Then act.'
+    ;;
+  3|swarm)
+    DIR=round3-swarm; LABEL='Round 3 · Swarm'; ROUND_NUM=3
+    KICKOFF='You are in the SWARM round. Read CLAUDE.md and task.md. Register on the roster as a peer. No coordinator, no roles, no stages. Read the board before every action, find a gap, post. The first to notice all sections covered drafts the itinerary.'
+    ;;
   *)
     echo "usage: $0 <round>" >&2
     echo "  round = 1 (supervisor) | 2 (pipeline) | 3 (swarm)" >&2
@@ -47,22 +56,24 @@ ln -sf "${DIR}/CLAUDE.md" CLAUDE.md
 echo "▶ ${LABEL} · CLAUDE.md → ${DIR}/CLAUDE.md"
 
 # window 0 — terminal mirror + 3 agents
-tmux new-session  -d -s lab3 -n agents './bb-watch.sh'
-tmux split-window -h -t lab3:0   'claude --model haiku'
-tmux split-window -v -t lab3:0.0 'claude --model haiku'
-tmux split-window -v -t lab3:0.2 'claude --model haiku'
+# capture stable pane IDs (%N) so auto-kickoff hits the right panes regardless
+# of how tmux re-indexes after each split.
+tmux new-session -d -s lab3 -n agents './bb-watch.sh'
+PANE_AGENTS_TOPRIGHT=$(tmux split-window -h -t lab3:0   -P -F '#{pane_id}' 'claude --model haiku')
+PANE_AGENTS_BOTLEFT=$( tmux split-window -v -t lab3:0.0 -P -F '#{pane_id}' 'claude --model haiku')
+PANE_AGENTS_BOTRIGHT=$(tmux split-window -v -t "$PANE_AGENTS_TOPRIGHT" -P -F '#{pane_id}' 'claude --model haiku')
 tmux select-layout -t lab3:0 tiled
 
 # window 1 — web mirror server (auto-opens browser to localhost:8765)
-tmux new-window -t lab3 -n mirror './bb-serve.sh'
+tmux new-window -t lab3 -n mirror "./bb-serve.sh ${ROUND_NUM}"
 
-# auto-kickoff: same prompt for all rounds, CLAUDE.md handles role-by-slot
-KICKOFF='Read CLAUDE.md and task.md. Register yourself on the roster following the protocol for this round. Then act on your role.'
+# auto-kickoff: round-specific prompt anchors agents in their topology
 (
   sleep 8
-  for pane in 1 2 3; do
-    tmux send-keys -t "lab3:0.${pane}" "$KICKOFF"
-    tmux send-keys -t "lab3:0.${pane}" Enter
+  for pane in "$PANE_AGENTS_TOPRIGHT" "$PANE_AGENTS_BOTLEFT" "$PANE_AGENTS_BOTRIGHT"; do
+    tmux send-keys -t "$pane" "$KICKOFF"
+    sleep 0.5
+    tmux send-keys -t "$pane" Enter
     sleep 5
   done
 ) >/dev/null 2>&1 &

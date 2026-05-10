@@ -12,8 +12,17 @@ Read `blackboard.md`'s `## Roster`. Take the next free slot and register with yo
 | agent-2 | Lodging | Lodging + Budget v1 | task.md + agent-1's Transport entry |
 | agent-3 | Activities | Activities + final Itinerary | task.md + agent-1 + agent-2 |
 
+**Roles must be one of `transport`, `lodging`, `activities`** (matching the stage you own):
+
 ```bash
-printf -- '- %s · joined %s · stage-%d %s\n' "agent-N" "$(date -u +%FT%TZ)" N "<owned section>" >> blackboard.md
+# agent-1 (first in):
+printf -- '- agent-1 · joined %s · transport\n' "$(date -u +%FT%TZ)" >> blackboard.md
+
+# agent-2 (second in):
+printf -- '- agent-2 · joined %s · lodging\n' "$(date -u +%FT%TZ)" >> blackboard.md
+
+# agent-3 (third in):
+printf -- '- agent-3 · joined %s · activities\n' "$(date -u +%FT%TZ)" >> blackboard.md
 ```
 
 ## Step 2 — Wait for your turn

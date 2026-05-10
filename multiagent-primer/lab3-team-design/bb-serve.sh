@@ -4,13 +4,14 @@
 # Starts python3's built-in http server in this directory and opens
 # bb-mirror.html. The page polls blackboard.md once per second.
 #
-# usage:  ./bb-serve.sh [port]
+# usage:  ./bb-serve.sh [round] [port]
 # default port: 8765
 
 set -eu
 cd "$(dirname "$0")"
 
-PORT="${1:-8765}"
+ROUND="${1:-}"
+PORT="${2:-8765}"
 
 if ! command -v python3 >/dev/null 2>&1; then
   echo "python3 not found. Ask Claude to install it, or use ./bb-watch.sh (terminal mirror) instead." >&2
@@ -18,6 +19,7 @@ if ! command -v python3 >/dev/null 2>&1; then
 fi
 
 URL="http://localhost:${PORT}/bb-mirror.html"
+[ -n "$ROUND" ] && URL="${URL}?round=${ROUND}"
 
 echo "▶ serving $(pwd) on port ${PORT}"
 echo "▶ live mirror: ${URL}"

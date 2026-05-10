@@ -48,10 +48,10 @@ render() {
 
   roster=$(awk '/^- agent-/ { gsub(/^- /, ""); print $1 }' "$BOARD" | sort -u)
   findings=$(count_default0 '^### \[agent-')
-  s_setup=$( count_default0 '^\*\*Section:\*\* Transport')
-  s_emer=$(  count_default0 '^\*\*Section:\*\* Lodging')
-  s_lim=$(   count_default0 '^\*\*Section:\*\* Activities')
-  s_impl=$(  count_default0 '^\*\*Section:\*\* Budget')
+  s_setup=$( count_default0 '^\*\*Section:\*\* Setup')
+  s_emer=$(  count_default0 '^\*\*Section:\*\* Emergent')
+  s_lim=$(   count_default0 '^\*\*Section:\*\* Limitations')
+  s_impl=$(  count_default0 '^\*\*Section:\*\* Implications')
 
   last_line=$(grep '^### \[agent-' "$BOARD" | tail -1 || true)
   last_agent=""; ago=""
@@ -61,7 +61,7 @@ render() {
     ago=$(( now - $(to_epoch "$last_ts") ))
   fi
 
-  synth=$(grep '^## ITINERARY' "$BOARD" | head -1 || true)
+  synth=$(grep '^## SYNTHESIS' "$BOARD" | head -1 || true)
 
   dups=$(awk '
     /^### \[agent-/ {
@@ -77,7 +77,7 @@ render() {
   ' "$BOARD")
 
   # ── header ──────────────────────────────────────────────────────────
-  printf '%sLAB 3%s  %s%s%s   ' "$B" "$R" "$D" "$hr" "$R"
+  printf '%sLAB 1%s  %s%s%s   ' "$B" "$R" "$D" "$hr" "$R"
   if [ -z "$roster" ]; then
     printf '%sno agents yet%s' "$D" "$R"
   else
@@ -86,8 +86,8 @@ render() {
   printf '\n'
 
   # ── coverage bars (2 columns) ───────────────────────────────────────
-  printf '  Transport   %s %d   Activities  %s %d\n' "$(bar "$s_setup")" "$s_setup" "$(bar "$s_lim")"  "$s_lim"
-  printf '  Lodging     %s %d   Budget      %s %d\n' "$(bar "$s_emer")"  "$s_emer"  "$(bar "$s_impl")" "$s_impl"
+  printf '  Setup       %s %d   Limits      %s %d\n' "$(bar "$s_setup")" "$s_setup" "$(bar "$s_lim")"  "$s_lim"
+  printf '  Emergent    %s %d   Implications %s %d\n' "$(bar "$s_emer")"  "$s_emer"  "$(bar "$s_impl")" "$s_impl"
 
   # ── status line ─────────────────────────────────────────────────────
   printf '  %d findings' "$findings"

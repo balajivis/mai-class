@@ -363,6 +363,11 @@ p{margin:0}
 
   <div class="runhead">
     <span id="round-label">Lab 03 · Team Design</span>
+    <script>
+      const _r = new URLSearchParams(location.search).get('round');
+      const _names = {'1':'Round 1 · Supervisor','2':'Round 2 · Pipeline','3':'Round 3 · Swarm'};
+      if(_r && _names[_r]) document.getElementById('round-label').textContent = 'Lab 03 · ' + _names[_r];
+    </script>
     <span class="rh-mark">Modern AI <span class="amp">&amp;</span> Pro</span>
     <span id="conn-status">— connecting —</span>
   </div>
@@ -602,14 +607,17 @@ const SECTIONS = ['Transport','Lodging','Activities','Budget'];
 
 function pad(n){ return String(n).padStart(2,'0'); }
 
-// Parse blackboard.md → { roster:[{name,joined}], findings:[{agent,section,headline,ts}], synthAgent }
+// Parse blackboard.md → { roster:[{name,joined,role}], findings:[{agent,section,headline,ts}], synthAgent }
 function parseBoard(md){
   const roster = [];
   const seen = new Set();
-  const rosterRe = /^- (agent-\d+) · joined ([0-9T:Z\-]+)/gm;
+  const rosterRe = /^- (agent-\d+) · joined ([0-9T:Z\-]+)(?:\s*·\s*(.+?))?\s*$/gm;
   let m;
   while((m = rosterRe.exec(md))){
-    if(!seen.has(m[1])){ seen.add(m[1]); roster.push({name:m[1], joined:m[2]}); }
+    if(!seen.has(m[1])){
+      seen.add(m[1]);
+      roster.push({name:m[1], joined:m[2], role:(m[3]||'').trim()});
+    }
   }
 
   const findings = [];
@@ -633,7 +641,8 @@ function parseBoard(md){
     }
   }
 
-  const synthMatch = md.match(/^## SYNTHESIS \(drafted by (agent-\d+)\)/m);
+  // Lab 3 uses "## ITINERARY" (drafted/assembled). Match either drafter wording.
+  const synthMatch = md.match(/^## ITINERARY \((?:drafted|assembled) by (agent-\d+|supervisor)\)/m);
   const synthAgent = synthMatch ? synthMatch[1] : null;
 
   return { roster, findings, synthAgent };
@@ -677,7 +686,15 @@ function render(state){
 
     if(entry){
       card.classList.remove('unregistered');
-      card.querySelector('[data-joined]').textContent = 'joined ' + entry.joined.replace(/.*T/,'').replace('Z','');
+      const nameEl = card.querySelector('[data-name]');
+      const tagEl  = card.querySelector('[data-joined]');
+      if(entry.role){
+        nameEl.textContent = entry.role;
+        tagEl.textContent  = entry.name + ' · ' + entry.joined.replace(/.*T/,'').replace('Z','');
+      } else {
+        nameEl.textContent = entry.name;
+        tagEl.textContent  = 'joined ' + entry.joined.replace(/.*T/,'').replace('Z','');
+      }
     }
     card.querySelector('[data-writes]').textContent = writes.length;
     card.querySelector('[data-last]').textContent = last ? last.section : '—';
@@ -712,14 +729,17 @@ function render(state){
     } else {
       entriesEl.innerHTML = '';
       // newest first, max 3 per partition (each is now ~3 lines tall)
+      const roleByAgent = Object.fromEntries(state.roster.map(r => [r.name, r.role]));
       items.slice().reverse().slice(0,3).forEach((f) => {
         const e = document.createElement('div');
         e.className = `entry ${agentClass(f.agent)}`;
         const tickLabel = 't' + pad(state.findings.indexOf(f)+1);
+        const role = roleByAgent[f.agent] || '';
+        const byline = role ? role : f.agent;
         e.innerHTML = `
           <span class="e-tick">${tickLabel}</span>
           <span class="e-text">${f.headline}</span>
-          <span class="e-by">${f.agent}</span>
+          <span class="e-by">${byline}</span>
         `;
         entriesEl.appendChild(e);
       });
@@ -764,13 +784,13 @@ function render(state){
     $('#roster-body').innerHTML = state.roster.map(r => `<b>${r.name}</b>`).join(' · ');
   }
 
-  // coverage cell
-  const coveredSections = SECTIONS.filter(s => counts[s] >= 2).length;
+  // coverage cell — Lab 3 uses ≥1/section since each section is owned, not crowdsourced
+  const coveredSections = SECTIONS.filter(s => counts[s] >= 1).length;
   $('#coverage-v').innerHTML = `<em>${coveredSections}</em> / 4 sections`;
-  const thinSections = SECTIONS.filter(s => counts[s] < 2);
+  const thinSections = SECTIONS.filter(s => counts[s] < 1);
   $('#coverage-body').textContent = thinSections.length === 0
     ? 'All sections covered. Synthesis can proceed.'
-    : 'Thin: ' + thinSections.join(', ');
+    : 'Empty: ' + thinSections.join(', ');
 
   // synthesis
   const synthCard = $('#synth-card');

@@ -10,9 +10,14 @@ This is the same pattern as Lab 1. The point of running it again here is to feel
 
 Read `blackboard.md`'s `## Roster`. Take the next free slot (agent-1 / agent-2 / agent-3) and append:
 
+All three agents register with the role `peer` (no specialisation in swarm):
+
 ```bash
-printf -- '- %s · joined %s · peer\n' "agent-N" "$(date -u +%FT%TZ)" >> blackboard.md
+# agent-1 / agent-2 / agent-3 — same role, just take the next free slot:
+printf -- '- agent-N · joined %s · peer\n' "$(date -u +%FT%TZ)" >> blackboard.md
 ```
+
+Replace `agent-N` with your actual slot.
 
 ### 2. Read the board before doing anything
 
