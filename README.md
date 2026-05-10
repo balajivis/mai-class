@@ -17,7 +17,7 @@ The full pedagogical vision lives in [`PROJECT.md`](./PROJECT.md). Read that fir
 
 1. **Block A — Single-agent workflow rhythm** (`multiagent-primer/lab0-workflow/`, bundles gstack) — 45 min
 2. **Block B — Feel the primitives** (`multiagent-primer/` Labs 1-3) — 90 min
-3. **Block D — Real channel, real human** (`multiagent-primer/lab4-openclaw (optional)/`) — 45 min, *optional*
+3. **Block D — Real channel, real human** (`multiagent-primer/lab4-openclaw-optional/`) — 45 min, *optional*
 4. **Block E — Brownfield triage capstone** (`brownfield/`) — 2 hr
 5. **Block F — Production walk** (`multiagent-primer/lab0-workflow/SDRAuto/`) — 30 min
 

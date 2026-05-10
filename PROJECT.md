@@ -91,11 +91,11 @@ A LangGraph comparison remains a take-home bonus *after* the labs — that one i
 - **Lesson it lands:** §9 Team Design
 - **Pain it teaches:** topology-task mismatch, supervisor as bottleneck, pipeline as serial death, swarm as drift
 
-### Lab 4 — `lab4-openclaw (optional)/` ✅ BUILT (optional)
+### Lab 4 — `lab4-openclaw-optional/` ✅ BUILT (optional)
 - **Time:** 45 min
 - **Status:** optional — skip if the room is short on time or students don't all have Telegram accounts
 - **Builds on:** Lab 3 (assumes the student has now coordinated agents in shared state)
-- **New apparatus:** [openclaw](./multiagent-primer/lab4-openclaw%20%28optional%29/openclaw/) — a self-hosted agent gateway connecting a Claude/Groq agent to a Telegram bot
+- **New apparatus:** [openclaw](./multiagent-primer/lab4-openclaw-optional/openclaw/) — a self-hosted agent gateway connecting a Claude/Groq agent to a Telegram bot
 - **Lesson it lands:** §10 HITL — agents in production talk to *humans on real channels*, not just to each other in a tmux pane
 - **Pain it teaches:** API key management, channel auth, rate limits, the gap between "demo on a laptop" and "deployed on a number a customer can DM"
 
@@ -165,7 +165,7 @@ After all three labs + big exercise, students have **personally implemented** ~7
 | `lab1-blackboard/` | ✅ Built and smoke-tested 2026-05-09 |
 | `lab2-task-allocation/` | ⏳ Designed, not built. Needs `CLAUDE.md` + `task-cli/` (~60 LOC Node) |
 | `lab3-team-design/` | ⏳ Designed, not built. Three `CLAUDE.md` variants for three topologies |
-| `lab4-openclaw (optional)/` | ✅ Built 2026-05-09. Bundles the `openclaw/` self-hosted agent gateway. Needs a lab-level wrapper README. |
+| `lab4-openclaw-optional/` | ✅ Built 2026-05-09. Lab-level wrapper README + bundled `openclaw/` agent gateway. |
 | `bonus-langgraph/` | ⏳ Designed, not built. Same Smallville task in ~60 LOC of LangGraph |
 | `PROJECT.md` (this file) | ✅ |
 
