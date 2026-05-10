@@ -2,7 +2,7 @@
 
 **Time:** 45 min (10 setup · 30 work · 5 reflect)
 **Lessons it sets up:** §2 Agent Anatomy (R/A/O loop) and the inversion that lands in Lab 1.
-**Where this fits:** the warmup. First lab of the [multi-agent primer](../). Block A of the [mai-class day](../../README.md). Read [`PROJECT.md`](../../PROJECT.md) for the full pedagogical thesis.
+**Where this fits:** the warmup. First lab of the [multi-agent primer](../README.md). Read [`../PROJECT.md`](../PROJECT.md) for the full pedagogical thesis.
 
 ---
 
@@ -18,7 +18,7 @@ You'll run one Claude Code session through a packaged sprint workflow — Office
 
 This lab bundles [`./gstack/`](./gstack/) — a single-agent workflow library by Garry Tan. ~20 specialist slash commands, no coordination machinery. See [`gstack-reference.md`](./gstack-reference.md) for the full catalog.
 
-(Wondering "why a framework in the no-framework primer?" — see *Note on frameworks* in [`../../PROJECT.md`](../../PROJECT.md). Short version: gstack is single-agent workflow scaffolding, not multi-agent coordination. The primer's no-framework rule is about the latter.)
+(Wondering "why a framework in the no-framework primer?" — see *Note on frameworks* in [`../PROJECT.md`](../PROJECT.md). Short version: gstack is single-agent workflow scaffolding, not multi-agent coordination. The primer's no-framework rule is about the latter.)
 
 ---
 

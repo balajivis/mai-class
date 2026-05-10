@@ -1,5 +1,5 @@
 {
-  "version": 8,
+  "version": 10,
   "brief": "SDRAuto sprint backlog — 8 tasks, 2 agent-rounds. Round 2: first-claim. Round 3: capability-aware (contract-net).",
   "tasks": [
     {
@@ -24,11 +24,11 @@
       ],
       "estimate_min": 3,
       "output": "outputs/T-02-investigation.md",
-      "status": "claimed",
+      "status": "done",
       "claimed_by": "agent-2",
       "claimed_at": "2026-05-10T02:56:40.392Z",
-      "completed_at": null,
-      "result": null
+      "completed_at": "2026-05-10T02:57:35.712Z",
+      "result": "Flakiness root cause: 64-bit token entropy + unbounded session accumulation = 19% collision probability after 50 tokens (birthday paradox)"
     },
     {
       "id": "T-03",
@@ -52,9 +52,9 @@
       ],
       "estimate_min": 3,
       "output": "outputs/T-04-qa.md",
-      "status": "open",
-      "claimed_by": null,
-      "claimed_at": null,
+      "status": "claimed",
+      "claimed_by": "agent-2",
+      "claimed_at": "2026-05-10T02:57:40.012Z",
       "completed_at": null,
       "result": null
     },

@@ -86,7 +86,8 @@ This framework is the spine of the course. Every lab and every design choice in 
 | Lab 2 — Task allocation | 2 | 6, 12 (negotiation and trust become obvious gaps) |
 | Lab 3 — Team design | 3 | 7, 15 (BDI drift, coordination eval) |
 | Lab 4 — openclaw *(optional)* | 10 | 5 (channel = real intent), 13 (governance for a public bot) |
-| Big exercise (other folder) | 1, 2, 3, 8, 10, 13, 15 | 9, 14 |
+| Lab 5 — build sprint *(capstone)* | 1, 2, 3, 4, 5, 9, 15 | 8 (memory across rounds via lessons) |
+| Big exercise (separate repo) | 1, 2, 3, 8, 10, 13, 15 | 9, 14 |
 
 After all labs + big exercise, students have **personally implemented ~7 of 16 pillars** and **felt the absence** of another ~6. Enough fluency to read framework docs critically.
 
@@ -106,12 +107,13 @@ After all labs + big exercise, students have **personally implemented ~7 of 16 p
 
 | Component | State |
 |---|---|
-| `lab0-workflow/` | ✅ Built. Bundles `gstack/` toolkit + `SDRAuto/` and `docvault-legacy/` sandboxes. |
+| `lab0-workflow/` | ✅ Built. Bundles `gstack/` toolkit + `docvault-legacy/` (default) and `SDRAuto/` (alt) sandboxes. |
 | `lab1-blackboard/` | ✅ Built and smoke-tested. |
 | `lab2-task-allocation/` | ✅ Built. CLAUDE.md + `task-cli/` (Node) + 3 rounds (free-for-all → first-claim → contract-net). |
-| `lab3-team-design/` | 🟡 Partial. `round1-supervisor/CLAUDE.md` present; `round2-pipeline/`, `round3-swarm/` scaffolds in progress. |
+| `lab3-team-design/` | ✅ Built. Three round folders (`round1-supervisor/`, `round2-pipeline/`, `round3-swarm/`), each with its own CLAUDE.md; same `task.md`. |
 | `lab4-openclaw-optional/` | ✅ Built. Wrapper README + bundled `openclaw/` agent gateway. |
-| `bonus-langgraph/` | ⏳ Designed, not built. Same Smallville task in ~60 LOC of LangGraph. |
+| `lab5-build-sprint/` | ✅ Built. Role-specialized agents (frontend/backend/tests), typed performatives, `task-cli/` with capability tags, `eval-self.sh` for 3-tier evaluation. |
+| `bonus-langgraph/` | ⏳ Designed, not built. Same coordination problem in ~60 LOC of LangGraph. |
 | `README.md` (student entry point) | ✅ |
 | `PROJECT.md` (this file — design doc) | ✅ |
 
@@ -142,11 +144,11 @@ Last updated: 2026-05-09.
 
 ## What future Claude SHOULD do, if asked to continue building
 
-1. **Finish Lab 3 round2 + round3 CLAUDE.md variants.** Round 2 (pipeline) and Round 3 (swarm). Same `task.md`, three `round*-*/CLAUDE.md` variants — that's the entire scaffold. No new code.
-2. **Build the LangGraph bonus.** ~60 LOC, runnable in Python, side-by-side with Lab 1's Smallville task. The student's reaction should be *"oh — the framework is just packaging the patterns we invented."* That's the perfect inversion.
-3. **Update the Status snapshot** above every time you build or change a lab.
-4. **Update README.md's lab table** if you add or remove a lab. The two docs reference the same labs — keep them in sync.
-5. **Re-test `bb-watch.sh`** if you change the blackboard template — the script's grep patterns are coupled to the template's section names.
+1. **Build the LangGraph bonus.** ~60 LOC, runnable in Python, side-by-side with one of the labs (probably Lab 5 since that's the most framework-like in scope). The student's reaction should be *"oh — the framework is just packaging the patterns we invented."* That's the perfect inversion.
+2. **Update the Status snapshot** above every time you build or change a lab.
+3. **Update README.md's lab table** if you add, remove, or rename a lab. The two docs reference the same labs — keep them in sync.
+4. **Re-test `bb-watch.sh`** if you change the blackboard template — the script's grep patterns are coupled to the template's section names.
+5. **Don't renumber the labs.** Lab 5 sits after Lab 4 in numbering but *runs before it* in the recommended order. Renumbering would break dozens of cross-references.
 
 ---
 
@@ -154,8 +156,8 @@ Last updated: 2026-05-09.
 
 - This file: `./PROJECT.md`
 - Student entry point: `./README.md`
-- Big exercise (separate Claude session, separate concern): `../blackboard-classroom/`
-- Workshop-kit (the student plugin for the big exercise — being moved to its own GitHub repo at `Kapi-IDE/workshop-kit`): `../workshop-kit/`
+- Big exercise (separate repo, separate Claude session): the blackboard-classroom server has been moved out of this repo to its own deploy lifecycle.
+- Workshop-kit (student plugin for the big exercise): now at `github.com/Kapi-IDE/workshop-kit` so `claude plugins install Kapi-IDE/workshop-kit` works.
 - Course lesson source (when present): `../../class-platform/app/paths/multiagents-v2/_lessons/`
 - The 16 Pillars lesson source: `class-platform/app/paths/multiagents-v2/_lessons/sixteen-pillar-framework.tsx`
 

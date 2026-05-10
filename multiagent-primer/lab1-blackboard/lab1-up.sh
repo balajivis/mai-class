@@ -30,10 +30,12 @@ cp blackboard.template.md blackboard.md
 echo "▶ blackboard.md reset"
 
 # window 0 — terminal mirror + 3 agents
-tmux new-session  -d -s lab1 -n agents './bb-watch.sh'
-tmux split-window -h -t lab1:0   'claude --model haiku'
-tmux split-window -v -t lab1:0.0 'claude --model haiku'
-tmux split-window -v -t lab1:0.2 'claude --model haiku'
+# capture stable pane IDs (%N) so auto-kickoff hits the right panes regardless
+# of how tmux re-indexes after each split.
+tmux new-session -d -s lab1 -n agents './bb-watch.sh'
+PANE_TOPRIGHT=$(tmux split-window -h -t lab1:0   -P -F '#{pane_id}' 'claude --model haiku')
+PANE_BOTLEFT=$( tmux split-window -v -t lab1:0.0 -P -F '#{pane_id}' 'claude --model haiku')
+PANE_BOTRIGHT=$(tmux split-window -v -t "$PANE_TOPRIGHT" -P -F '#{pane_id}' 'claude --model haiku')
 tmux select-layout -t lab1:0 tiled
 
 # window 1 — web mirror server (auto-opens browser to localhost:8765)
@@ -45,9 +47,10 @@ tmux new-window -t lab1 -n mirror './bb-serve.sh'
 KICKOFF='Read task.md. Register yourself on the roster. Then begin.'
 (
   sleep 8                                                          # claude warmup
-  for pane in 1 2 3; do
-    tmux send-keys -t "lab1:0.${pane}" "$KICKOFF"
-    tmux send-keys -t "lab1:0.${pane}" Enter
+  for pane in "$PANE_TOPRIGHT" "$PANE_BOTLEFT" "$PANE_BOTRIGHT"; do
+    tmux send-keys -t "$pane" "$KICKOFF"
+    sleep 0.5
+    tmux send-keys -t "$pane" Enter
     sleep 5
   done
 ) >/dev/null 2>&1 &

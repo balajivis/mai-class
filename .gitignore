@@ -56,4 +56,20 @@ venv/
 ecosystem.config.cjs.local
 
 # MCP blackboard runtime state (heartbeat-updated, not source)
-**/.kapi/blackboard-live.yaml
+**/.kapi/
+
+# Per-lab smoke-test artifacts (regenerated each run, not source material)
+multiagent-primer/lab*/runs/
+multiagent-primer/lab*/outputs/
+multiagent-primer/lab*/sandbox/
+
+# Live blackboard files — students populate these from .template.md on each run
+multiagent-primer/lab1-blackboard/blackboard.md
+multiagent-primer/lab2-task-allocation/tasks.json
+multiagent-primer/lab2-task-allocation/tasks.md
+multiagent-primer/lab3-team-design/blackboard.md
+multiagent-primer/lab5-build-sprint/blackboard.md
+multiagent-primer/lab5-build-sprint/tasks.json
+
+# Per-project local Claude settings
+**/.claude/settings.local.json
